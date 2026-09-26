@@ -27,3 +27,6 @@ jobs:
 
       - name: Build
         run: dotnet build ConferenceRoomBooking.sln --no-restore --configuration Release
+
+      - name: Run Unit Tests
+        run: dotnet test ConferenceRoomBooking.sln --no-build --configuration Release
