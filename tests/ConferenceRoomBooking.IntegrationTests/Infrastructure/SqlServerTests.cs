@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace ConferenceRoomBooking.IntegrationTests.Infrastructure;
 
 [TestFixture]
@@ -14,7 +16,7 @@ public class SqlServerTests
         await _fixture.InitializeAsync();
 
         await using var dbContext = _fixture.CreateDbContext();
-        await dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.MigrateAsync();
     }
 
     [OneTimeTearDown]

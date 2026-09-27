@@ -1,4 +1,3 @@
-using System;
 using ConferenceRoomBooking.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,4 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<BookingAdditionalService> BookingAdditionalServices => Set<BookingAdditionalService>();
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    }
 }
