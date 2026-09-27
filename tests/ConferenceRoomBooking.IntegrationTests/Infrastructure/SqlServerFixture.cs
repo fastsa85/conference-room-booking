@@ -7,18 +7,18 @@ namespace ConferenceRoomBooking.IntegrationTests.Infrastructure;
 
 public class SqlServerFixture : IAsyncDisposable
 {
-    private readonly MsSqlContainer _container = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
+    private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
 
-    public string ConnectionString => _container.GetConnectionString();
+    public string ConnectionString => _msSqlContainer.GetConnectionString();
 
     public async Task InitializeAsync()
     {
-        await _container.StartAsync();
+        await _msSqlContainer.StartAsync();
     }       
 
     public ValueTask DisposeAsync()
     {
-        return _container.DisposeAsync();
+        return _msSqlContainer.DisposeAsync();
     }
 
     public AppDbContext CreateDbContext()
