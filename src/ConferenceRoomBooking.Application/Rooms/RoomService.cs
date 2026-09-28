@@ -21,16 +21,25 @@ namespace ConferenceRoomBooking.Application.Rooms
             return _roomRepository.GetByIdAsync(id);
         }
 
-        public async Task<Room> CreateAsync(string name, int capacity, decimal hourlyRate)
+        public async Task<Room> CreateAsync(string name, int capacity, decimal hourlyRate, IReadOnlyCollection<AdditionalServiceInput> availableServices)
         {
             Validate(name, capacity, hourlyRate);
+            ValidateAvailableServices(availableServices);
 
             var room = new Room
             {
                 Id = Guid.NewGuid(),
                 Name = name,
                 Capacity = capacity,
-                HourlyRate = hourlyRate
+                HourlyRate = hourlyRate,
+                AvailableServices = availableServices.Select(service =>
+                    new AdditionalService
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = service.Name,
+                        Price = service.Price
+                    })
+                .ToList()
             };
 
             await _roomRepository.AddAsync(room);
@@ -87,6 +96,22 @@ namespace ConferenceRoomBooking.Application.Rooms
             if (hourlyRate < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(hourlyRate), "Hourly rate cannot be negative.");
+            }
+        }
+
+        private static void ValidateAvailableServices(IReadOnlyCollection<AdditionalServiceInput> availableServices)
+        {
+            foreach (var service in availableServices)
+            {
+                if (string.IsNullOrWhiteSpace(service.Name))
+                {
+                    throw new ArgumentException("Service name is required.", nameof(availableServices));
+                }
+
+                if (service.Price < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(availableServices), "Service price cannot be negative.");
+                }
             }
         }
     }

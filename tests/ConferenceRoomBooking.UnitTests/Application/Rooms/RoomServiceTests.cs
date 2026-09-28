@@ -88,9 +88,14 @@ public class RoomServiceTests
         const string name = "Room A";
         const int capacity = 10;
         const decimal hourlyRate = 100m;
+        var availableServices = new[]
+        {
+            new AdditionalServiceInput("Projector", 500m),
+            new AdditionalServiceInput("Wi-Fi", 300m)
+        };
 
         // Act
-        var result = await _service.CreateAsync(name, capacity, hourlyRate);
+        var result = await _service.CreateAsync(name, capacity, hourlyRate, availableServices);
 
         // Assert
         Assert.Multiple(() =>
@@ -99,6 +104,21 @@ public class RoomServiceTests
             Assert.That(result.Name, Is.EqualTo(name));
             Assert.That(result.Capacity, Is.EqualTo(capacity));
             Assert.That(result.HourlyRate, Is.EqualTo(hourlyRate));
+
+            Assert.That(result.AvailableServices, Has.Count.EqualTo(2));
+
+            Assert.That(
+                result.AvailableServices.Any(service =>
+                    service.Id != Guid.Empty &&
+                    service.Name == "Projector" &&
+                    service.Price == 500m),
+                Is.True);
+            Assert.That(
+                result.AvailableServices.Any(service =>
+                    service.Id != Guid.Empty &&
+                    service.Name == "Wi-Fi" &&
+                    service.Price == 300m),
+                Is.True);
         });
 
         _repository.Verify(
@@ -106,7 +126,8 @@ public class RoomServiceTests
                 room.Id == result.Id &&
                 room.Name == name &&
                 room.Capacity == capacity &&
-                room.HourlyRate == hourlyRate)),
+                room.HourlyRate == hourlyRate &&
+                room.AvailableServices.Count == 2)),
             Times.Once);
     }
 
@@ -190,7 +211,7 @@ public class RoomServiceTests
     [TestCase("   ")]
     public void CreateAsync_WithInvalidName_ThrowsArgumentException(string? name)
     {
-        Assert.ThrowsAsync<ArgumentException>(async () => await _service.CreateAsync(name!, 10, 100m));
+        Assert.ThrowsAsync<ArgumentException>(async () => await _service.CreateAsync(name!, 10, 100m, new List<AdditionalServiceInput>()));
 
         _repository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
     }
@@ -199,7 +220,7 @@ public class RoomServiceTests
     [TestCase(-1)]
     public void CreateAsync_WithInvalidCapacity_ThrowsArgumentOutOfRangeException(int capacity)
     {
-        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _service.CreateAsync("Room A", capacity, 100m));
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _service.CreateAsync("Room A", capacity, 100m, new List<AdditionalServiceInput>()));
 
         _repository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
     }
@@ -207,8 +228,30 @@ public class RoomServiceTests
     [Test]
     public void CreateAsync_WithNegativeHourlyRate_ThrowsArgumentOutOfRangeException()
     {
-        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _service.CreateAsync("Room A", 10, -1m));
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _service.CreateAsync("Room A", 10, -1m, new List<AdditionalServiceInput>()));
         _repository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
+    }
+
+    [Test]
+    public void CreateAsync_WithEmptyServiceName_ThrowsArgumentException()
+    {
+        var services = new[]
+        {
+            new AdditionalServiceInput("", 500m)
+        };
+
+        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync("Room A", 10, 100m, services));
+    }
+
+    [Test]
+    public void CreateAsync_WithNegativeServicePrice_ThrowsArgumentOutOfRangeException()
+    {
+        var services = new[]
+        {
+            new AdditionalServiceInput("Projector", -1m)
+        };
+
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.CreateAsync("Room A", 10, 100m, services));
     }
 
     private static Room CreateRoom(string name = "Room A")

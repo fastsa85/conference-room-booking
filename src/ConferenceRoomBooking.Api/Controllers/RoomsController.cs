@@ -1,5 +1,6 @@
 ﻿using ConferenceRoomBooking.Api.Models.Rooms;
 using ConferenceRoomBooking.Application.Rooms;
+using ConferenceRoomBooking.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConferenceRoomBooking.Api.Controllers;
@@ -20,7 +21,7 @@ public class RoomsController : ControllerBase
     {
         var rooms = await _roomService.GetAllAsync();
 
-        return Ok(rooms);
+        return Ok(rooms.Select(ToResponse));
     }
 
     [HttpGet("{id:guid}")]
@@ -33,22 +34,29 @@ public class RoomsController : ControllerBase
             return NotFound();
         }
 
-        return Ok(room);
+        return Ok(ToResponse(room));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateRoomRequest request)
+    public async Task<IActionResult> Create(CreateRoomRequest request)  
     {
+        var availableServices = request.AvailableServices
+            .Select(service => new AdditionalServiceInput(
+                    service.Name,
+                    service.Price))
+            .ToList();
+            
         var room = await _roomService.CreateAsync(
             request.Name,
             request.Capacity,
-            request.HourlyRate);
+            request.HourlyRate,
+            availableServices);
 
         return CreatedAtAction(
             nameof(GetById),
             new { id = room.Id },
-            room
-            );
+            ToResponse(room)
+        );
     }
 
     [HttpPut("{id:guid}")]
@@ -79,5 +87,24 @@ public class RoomsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    private static RoomResponse ToResponse(Room room)
+    {
+        return new RoomResponse
+        {
+            Id = room.Id,
+            Name = room.Name,
+            Capacity = room.Capacity,
+            HourlyRate = room.HourlyRate,
+            AvailableServices = room.AvailableServices
+                .Select(service => new AdditionalServiceResponse
+                {
+                    Id = service.Id,
+                    Name = service.Name,
+                    Price = service.Price
+                })
+                .ToList()
+        };
     }
 }

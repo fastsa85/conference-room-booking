@@ -8,7 +8,7 @@ public interface IRoomService
 
     Task<Room?> GetByIdAsync(Guid id);
 
-    Task<Room> CreateAsync(string name, int capacity, decimal hourlyRate);
+    Task<Room> CreateAsync(string name, int capacity, decimal hourlyRate, IReadOnlyCollection<AdditionalServiceInput> availableServices);
 
     Task<bool> UpdateAsync(Guid id, string name, int capacity, decimal hourlyRate);
 

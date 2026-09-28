@@ -1,4 +1,5 @@
-﻿using ConferenceRoomBooking.Domain.Entities;
+﻿using ConferenceRoomBooking.Api.Models.Rooms;
+using ConferenceRoomBooking.Domain.Entities;
 using ConferenceRoomBooking.Infrastructure.Persistence;
 using ConferenceRoomBooking.IntegrationTests.Infrastructure;
 using System.Net;
@@ -52,7 +53,7 @@ public class RoomsControllerTests
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
 
-        var createdRoom = await response.Content.ReadFromJsonAsync<Room>();
+        var createdRoom = await response.Content.ReadFromJsonAsync<RoomResponse>();
 
         Assert.That(createdRoom, Is.Not.Null);
 
@@ -80,6 +81,86 @@ public class RoomsControllerTests
             Assert.That(persistedRoom!.Name, Is.EqualTo(request.Name));
             Assert.That(persistedRoom.Capacity, Is.EqualTo(request.Capacity));
             Assert.That(persistedRoom.HourlyRate, Is.EqualTo(request.HourlyRate));
+        });
+    }
+
+    [Test]
+    public async Task CreateRoom_WithAvailableServices_CreatesRoomAndServices()
+    {
+        // Arrange
+        var request = new
+        {
+            Name = "Meeting Room A",
+            Capacity = 10,
+            HourlyRate = 100m,
+            AvailableServices = new[]
+            {
+                new
+                {
+                    Name = "Projector",
+                    Price = 500m
+                },
+                new
+                {
+                    Name = "Wi-Fi",
+                    Price = 300m
+                }
+            }
+        };
+
+        // Act
+        var response = await _fixture.Client.PostAsJsonAsync("/api/rooms", request);
+
+        // Assert
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+
+        var createdRoom = await response.Content.ReadFromJsonAsync<RoomResponse>();
+
+        Assert.That(createdRoom, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(createdRoom!.AvailableServices, Has.Count.EqualTo(2));
+
+            Assert.That(
+                createdRoom.AvailableServices.Any(service =>
+                    service.Id != Guid.Empty &&
+                    service.Name == "Projector" &&
+                    service.Price == 500m),
+                Is.True);
+
+            Assert.That(
+                createdRoom.AvailableServices.Any(service =>
+                    service.Id != Guid.Empty &&
+                    service.Name == "Wi-Fi" &&
+                    service.Price == 300m),
+                Is.True);
+        });
+
+        var persistedRoom =
+            await _fixture.GetRoomAsync(createdRoom!.Id);
+
+        Assert.That(persistedRoom, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                persistedRoom!.AvailableServices,
+                Has.Count.EqualTo(2));
+
+            Assert.That(
+                persistedRoom.AvailableServices.Any(service =>
+                    service.Name == "Projector" &&
+                    service.Price == 500m &&
+                    service.RoomId == persistedRoom.Id),
+                Is.True);
+
+            Assert.That(
+                persistedRoom.AvailableServices.Any(service =>
+                    service.Name == "Wi-Fi" &&
+                    service.Price == 300m &&
+                    service.RoomId == persistedRoom.Id),
+                Is.True);
         });
     }
 
@@ -133,6 +214,31 @@ public class RoomsControllerTests
             Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
+    [TestCase("", 500)]
+    [TestCase("   ", 500)]
+    [TestCase("Projector", -1)]
+    public async Task CreateRoom_WithInvalidAvailableService_ReturnsBadRequest(string serviceName, decimal servicePrice)
+    {
+        var request = new
+        {
+            Name = "Meeting Room A",
+            Capacity = 10,
+            HourlyRate = 100m,
+            AvailableServices = new[]
+            {
+                new
+                {
+                    Name = serviceName,
+                    Price = servicePrice
+                }
+            }
+        };
+
+        var response = await _fixture.Client.PostAsJsonAsync("/api/rooms", request);
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+    }
+
     // GET /api/rooms/{id}
 
     [Test]
@@ -160,7 +266,7 @@ public class RoomsControllerTests
             response.Content.Headers.ContentType?.MediaType,
             Is.EqualTo("application/json"));
 
-        var returnedRoom = await response.Content.ReadFromJsonAsync<Room>();
+        var returnedRoom = await response.Content.ReadFromJsonAsync<RoomResponse>();
 
         Assert.That(returnedRoom, Is.Not.Null);
 
@@ -222,7 +328,7 @@ public class RoomsControllerTests
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
-        var rooms = await response.Content.ReadFromJsonAsync<List<Room>>();
+        var rooms = await response.Content.ReadFromJsonAsync<List<RoomResponse>>();
 
         Assert.That(rooms, Is.Not.Null);
         Assert.That(rooms, Has.Count.EqualTo(2));
@@ -256,7 +362,7 @@ public class RoomsControllerTests
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
-        var rooms = await response.Content.ReadFromJsonAsync<List<Room>>();
+        var rooms = await response.Content.ReadFromJsonAsync<List<RoomResponse>>();
 
         Assert.That(rooms, Is.Not.Null);
         Assert.That(rooms, Is.Empty);
