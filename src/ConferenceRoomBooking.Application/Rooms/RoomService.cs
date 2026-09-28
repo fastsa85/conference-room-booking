@@ -23,7 +23,7 @@ namespace ConferenceRoomBooking.Application.Rooms
 
         public async Task<Room> CreateAsync(string name, int capacity, decimal hourlyRate, IReadOnlyCollection<AdditionalServiceInput> availableServices)
         {
-            Validate(name, capacity, hourlyRate);
+            ValidateRoomProperties(name, capacity, hourlyRate);
             ValidateAvailableServices(availableServices);
 
             var room = new Room
@@ -47,9 +47,10 @@ namespace ConferenceRoomBooking.Application.Rooms
             return room;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, string name, int capacity, decimal hourlyRate)
+        public async Task<bool> UpdateAsync(Guid id, string name, int capacity, decimal hourlyRate, IReadOnlyCollection<UpdateAdditionalServiceInput> availableServices)
         {
-            Validate(name, capacity, hourlyRate);
+            ValidateRoomProperties(name, capacity, hourlyRate);
+            ValidateAvailableServices(availableServices);
 
             var room = await _roomRepository.GetByIdAsync(id);
 
@@ -58,11 +59,19 @@ namespace ConferenceRoomBooking.Application.Rooms
                 return false;
             }
 
+            var requestedExistingIds = GetRequestedExistingServiceIds(availableServices);
+
+            ValidateServiceIds(room, requestedExistingIds);
+
+            // mutate only after validation to avoid leaving the room in an inconsistent state
             room.Name = name;
             room.Capacity = capacity;
             room.HourlyRate = hourlyRate;
 
-            await _roomRepository.UpdateAsync(room);
+            var servicesToRemove = RemoveMissingServices(room, requestedExistingIds);
+            var servicesToAdd = UpdateAvailableServices(room, availableServices);
+
+            await _roomRepository.UpdateAsync(room, servicesToAdd, servicesToRemove);
 
             return true;
         }
@@ -81,7 +90,77 @@ namespace ConferenceRoomBooking.Application.Rooms
             return true;
         }
 
-        private static void Validate(string name, int capacity, decimal hourlyRate)
+        private static HashSet<Guid> GetRequestedExistingServiceIds(IReadOnlyCollection<UpdateAdditionalServiceInput> availableServices)
+        {
+            return availableServices
+                .Where(service => service.Id.HasValue)
+                .Select(service => service.Id!.Value)
+                .ToHashSet();
+        }
+
+        private static void ValidateServiceIds(Room room, HashSet<Guid> requestedExistingIds)
+        {
+            var existingServiceIds = room.AvailableServices
+                .Select(service => service.Id)
+                .ToHashSet();
+
+            var invalidServiceIds = requestedExistingIds
+                .Except(existingServiceIds)
+                .ToList();
+
+            if (invalidServiceIds.Count > 0)
+            {
+                throw new ArgumentException($"Service '{invalidServiceIds[0]}' does not belong to room '{room.Id}'.");
+            }
+        }
+
+        private static List<AdditionalService> RemoveMissingServices(Room room, HashSet<Guid> requestedExistingIds)
+        {
+            var servicesToRemove = room.AvailableServices
+                .Where(service => !requestedExistingIds.Contains(service.Id))
+                .ToList();
+
+            foreach (var service in servicesToRemove)
+            {
+                room.AvailableServices.Remove(service);
+            }
+
+            return servicesToRemove;
+        }
+
+        private static List<AdditionalService> UpdateAvailableServices(Room room, IReadOnlyCollection<UpdateAdditionalServiceInput> availableServices)
+        {
+            var servicesToAdd = new List<AdditionalService>();
+
+            foreach (var input in availableServices)
+            {
+                if (input.Id.HasValue)
+                {
+                    var existingService = room.AvailableServices
+                        .Single(service => service.Id == input.Id.Value);
+
+                    existingService.Name = input.Name;
+                    existingService.Price = input.Price;
+                }
+                else
+                {
+                    var newService = new AdditionalService
+                    {
+                        Id = Guid.NewGuid(),
+                        RoomId = room.Id,
+                        Name = input.Name,
+                        Price = input.Price
+                    };
+
+                    room.AvailableServices.Add(newService);
+                    servicesToAdd.Add(newService);
+                }
+            }
+
+            return servicesToAdd;
+        }
+
+        private static void ValidateRoomProperties(string name, int capacity, decimal hourlyRate)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -100,6 +179,22 @@ namespace ConferenceRoomBooking.Application.Rooms
         }
 
         private static void ValidateAvailableServices(IReadOnlyCollection<AdditionalServiceInput> availableServices)
+        {
+            foreach (var service in availableServices)
+            {
+                if (string.IsNullOrWhiteSpace(service.Name))
+                {
+                    throw new ArgumentException("Service name is required.", nameof(availableServices));
+                }
+
+                if (service.Price < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(availableServices), "Service price cannot be negative.");
+                }
+            }
+        }
+
+        private static void ValidateAvailableServices(IReadOnlyCollection<UpdateAdditionalServiceInput> availableServices)
         {
             foreach (var service in availableServices)
             {

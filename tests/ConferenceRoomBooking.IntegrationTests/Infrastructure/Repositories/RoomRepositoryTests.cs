@@ -335,7 +335,7 @@ public class RoomRepositoryTests
         room.HourlyRate = 150m;
 
         // Act
-        await repository.UpdateAsync(room);
+        await repository.UpdateAsync(room, new List<AdditionalService>(), new List<AdditionalService>());
 
         // Assert
         await using var assertContext = _fixture.CreateDbContext();

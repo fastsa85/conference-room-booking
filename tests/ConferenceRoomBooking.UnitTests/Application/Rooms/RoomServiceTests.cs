@@ -7,14 +7,14 @@ namespace ConferenceRoomBooking.UnitTests.Application.Rooms;
 [TestFixture]
 public class RoomServiceTests
 {
-    private Mock<IRoomRepository> _repository = null!;
-    private RoomService _service = null!;
+    private Mock<IRoomRepository> _roomRepository = null!;
+    private RoomService _roomService = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _repository = new Mock<IRoomRepository>();
-        _service = new RoomService(_repository.Object);
+        _roomRepository = new Mock<IRoomRepository>();
+        _roomService = new RoomService(_roomRepository.Object);
     }
 
     [Test]
@@ -27,10 +27,10 @@ public class RoomServiceTests
             CreateRoom("Room B")
         };
 
-        _repository.Setup(x => x.GetAllAsync()).ReturnsAsync(rooms);
+        _roomRepository.Setup(x => x.GetAllAsync()).ReturnsAsync(rooms);
 
         // Act
-        var result = await _service.GetAllAsync();
+        var result = await _roomService.GetAllAsync();
 
         // Assert
         Assert.That(result, Is.SameAs(rooms));
@@ -42,10 +42,10 @@ public class RoomServiceTests
         // Arrange
         var rooms = new List<Room>();
 
-        _repository.Setup(x => x.GetAllAsync()).ReturnsAsync(rooms);
+        _roomRepository.Setup(x => x.GetAllAsync()).ReturnsAsync(rooms);
 
         // Act
-        var result = await _service.GetAllAsync();
+        var result = await _roomService.GetAllAsync();
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -57,10 +57,10 @@ public class RoomServiceTests
         // Arrange
         var room = CreateRoom();
 
-        _repository.Setup(x => x.GetByIdAsync(room.Id)).ReturnsAsync(room);
+        _roomRepository.Setup(x => x.GetByIdAsync(room.Id)).ReturnsAsync(room);
 
         // Act
-        var result = await _service.GetByIdAsync(room.Id);
+        var result = await _roomService.GetByIdAsync(room.Id);
 
         // Assert
         Assert.That(result, Is.SameAs(room));
@@ -72,10 +72,10 @@ public class RoomServiceTests
         // Arrange
         var id = Guid.NewGuid();
 
-        _repository.Setup(x => x.GetByIdAsync(id)).ReturnsAsync((Room?)null);
+        _roomRepository.Setup(x => x.GetByIdAsync(id)).ReturnsAsync((Room?)null);
 
         // Act
-        var result = await _service.GetByIdAsync(id);
+        var result = await _roomService.GetByIdAsync(id);
 
         // Assert
         Assert.That(result, Is.Null);
@@ -95,7 +95,7 @@ public class RoomServiceTests
         };
 
         // Act
-        var result = await _service.CreateAsync(name, capacity, hourlyRate, availableServices);
+        var result = await _roomService.CreateAsync(name, capacity, hourlyRate, availableServices);
 
         // Assert
         Assert.Multiple(() =>
@@ -121,7 +121,7 @@ public class RoomServiceTests
                 Is.True);
         });
 
-        _repository.Verify(
+        _roomRepository.Verify(
             x => x.AddAsync(It.Is<Room>(room =>
                 room.Id == result.Id &&
                 room.Name == name &&
@@ -137,10 +137,10 @@ public class RoomServiceTests
         // Arrange
         var room = CreateRoom();
 
-        _repository.Setup(x => x.GetByIdAsync(room.Id)).ReturnsAsync(room);
+        _roomRepository.Setup(x => x.GetByIdAsync(room.Id)).ReturnsAsync(room);
 
         // Act
-        var result = await _service.UpdateAsync(room.Id, "Updated Room", 20, 150m);
+        var result = await _roomService.UpdateAsync(room.Id, "Updated Room", 20, 150m, new List<UpdateAdditionalServiceInput>());
 
         // Assert
         Assert.That(result, Is.True);
@@ -152,7 +152,98 @@ public class RoomServiceTests
             Assert.That(room.HourlyRate, Is.EqualTo(150m));
         });
 
-        _repository.Verify(x => x.UpdateAsync(room), Times.Once);
+        _roomRepository.Verify(
+            x => x.UpdateAsync(
+                room,
+                It.Is<IReadOnlyCollection<AdditionalService>>(services => services.Count == 0),
+                It.Is<IReadOnlyCollection<AdditionalService>>(services => services.Count == 0)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task UpdateAsync_WithAvailableServices_UpdatesAddsAndRemovesServices()
+    {
+        // Arrange
+        var projectorId = Guid.NewGuid();
+        var wifiId = Guid.NewGuid();
+
+        var room = CreateRoom();
+
+        room.AvailableServices =
+        [
+            new AdditionalService
+        {
+            Id = projectorId,
+            RoomId = room.Id,
+            Name = "Projector",
+            Price = 500m
+        },
+        new AdditionalService
+        {
+            Id = wifiId,
+            RoomId = room.Id,
+            Name = "Wi-Fi",
+            Price = 300m
+        }
+        ];
+
+        _roomRepository.Setup(x => x.GetByIdAsync(room.Id))
+            .ReturnsAsync(room);
+
+        var services = new[]
+        {
+        new UpdateAdditionalServiceInput(
+            projectorId,
+            "Projector",
+            600m),
+
+        new UpdateAdditionalServiceInput(
+            null,
+            "Sound",
+            700m)
+        };
+
+        // Act
+        var result = await _roomService.UpdateAsync(
+            room.Id,
+            room.Name,
+            room.Capacity,
+            room.HourlyRate,
+            services);
+
+        // Assert
+        Assert.That(result, Is.True);
+        Assert.That(room.AvailableServices, Has.Count.EqualTo(2));
+
+        var projector = room.AvailableServices.Single(service => service.Id == projectorId);
+
+        var sound = room.AvailableServices.Single(service => service.Name == "Sound");
+
+        Assert.Multiple(() =>
+        {
+            // Existing service was updated
+            Assert.That(projector.Name, Is.EqualTo("Projector"));
+            Assert.That(projector.Price, Is.EqualTo(600m));
+
+            // New service was created
+            Assert.That(sound.Id, Is.Not.EqualTo(Guid.Empty));
+            Assert.That(sound.Price, Is.EqualTo(700m));
+
+            // Omitted service was removed
+            Assert.That(room.AvailableServices.Any(service => service.Id == wifiId), Is.False);
+        });
+
+        _roomRepository.Verify(
+            x => x.UpdateAsync(
+                room,
+                It.Is<IReadOnlyCollection<AdditionalService>>(services =>
+                    services.Count == 1 &&
+                    services.Single().Name == "Sound" &&
+                    services.Single().Price == 700m),
+                It.Is<IReadOnlyCollection<AdditionalService>>(services =>
+                    services.Count == 1 &&
+                    services.Single().Id == wifiId)),
+            Times.Once);
     }
 
     [Test]
@@ -161,15 +252,109 @@ public class RoomServiceTests
         // Arrange
         var id = Guid.NewGuid();
 
-        _repository.Setup(x => x.GetByIdAsync(id)).ReturnsAsync((Room?)null);
+        _roomRepository.Setup(x => x.GetByIdAsync(id)).ReturnsAsync((Room?)null);
 
         // Act
-        var result = await _service.UpdateAsync(id, "Room A", 10, 100m);
+        var result = await _roomService.UpdateAsync(id, "Room A", 10, 100m, new List<UpdateAdditionalServiceInput>());
 
         // Assert
         Assert.That(result, Is.False);
 
-        _repository.Verify(x => x.UpdateAsync(It.IsAny<Room>()), Times.Never);
+        _roomRepository.Verify(x => x.UpdateAsync(
+            It.IsAny<Room>(),
+            It.IsAny<IReadOnlyCollection<AdditionalService>>(),
+            It.IsAny<IReadOnlyCollection<AdditionalService>>()),
+            Times.Never);
+    }
+
+    [Test]
+    public void UpdateAsync_WithServiceIdNotBelongingToRoom_ThrowsArgumentException()
+    {
+        // Arrange
+        var room = CreateRoom();
+
+        var existingService = new AdditionalService
+        {
+            Id = Guid.NewGuid(),
+            RoomId = room.Id,
+            Name = "Projector",
+            Price = 500m
+        };
+
+        room.AvailableServices.Add(existingService);
+
+        _roomRepository.Setup(x => x.GetByIdAsync(room.Id))
+            .ReturnsAsync(room);
+
+        var services = new[]
+        {
+            new UpdateAdditionalServiceInput(
+                Guid.NewGuid(),
+                "Sound",
+                700m)
+        };
+
+        // Act and Assert
+        Assert.ThrowsAsync<ArgumentException>(() =>
+            _roomService.UpdateAsync(
+                room.Id,
+                room.Name,
+                room.Capacity,
+                room.HourlyRate,
+                services));
+
+        _roomRepository.Verify(x => x.UpdateAsync(
+            It.IsAny<Room>(),
+            It.IsAny<IReadOnlyCollection<AdditionalService>>(),
+            It.IsAny<IReadOnlyCollection<AdditionalService>>()),
+            Times.Never);
+    }
+
+    [Test]
+    public void UpdateAsync_WithEmptyServiceId_ThrowsArgumentException()
+    {
+        // Arrange
+        var room = new Room
+        {
+            Id = Guid.NewGuid(),
+            Name = "Meeting Room",
+            Capacity = 10,
+            HourlyRate = 100,
+            AvailableServices =
+            [
+                new AdditionalService
+            {
+                Id = Guid.NewGuid(),
+                Name = "Projector",
+                Price = 500
+            }
+            ]
+        };
+
+        _roomRepository
+            .Setup(repository => repository.GetByIdAsync(room.Id))
+            .ReturnsAsync(room);
+
+        var availableServices = new List<UpdateAdditionalServiceInput>
+        {
+            new(Guid.Empty, "Projector", 600)
+        };
+
+        // Act and Assert   
+        var exception = Assert.ThrowsAsync<ArgumentException>(
+            () => _roomService.UpdateAsync(
+                room.Id,
+                "Updated Room",
+                20,
+                150,
+                availableServices));
+
+        _roomRepository.Verify(
+            repository => repository.UpdateAsync(
+                It.IsAny<Room>(),
+                It.IsAny<IReadOnlyCollection<AdditionalService>>(),
+                It.IsAny<IReadOnlyCollection<AdditionalService>>()),
+            Times.Never);
     }
 
     [Test]
@@ -178,15 +363,15 @@ public class RoomServiceTests
         // Arrange
         var room = CreateRoom();
 
-        _repository.Setup(x => x.GetByIdAsync(room.Id)).ReturnsAsync(room);
+        _roomRepository.Setup(x => x.GetByIdAsync(room.Id)).ReturnsAsync(room);
 
         // Act
-        var result = await _service.DeleteAsync(room.Id);
+        var result = await _roomService.DeleteAsync(room.Id);
 
         // Assert
         Assert.That(result, Is.True);
 
-        _repository.Verify(x => x.DeleteAsync(room), Times.Once);
+        _roomRepository.Verify(x => x.DeleteAsync(room), Times.Once);
     }
 
     [Test]
@@ -195,15 +380,15 @@ public class RoomServiceTests
         // Arrange
         var id = Guid.NewGuid();
 
-        _repository.Setup(x => x.GetByIdAsync(id)).ReturnsAsync((Room?)null);
+        _roomRepository.Setup(x => x.GetByIdAsync(id)).ReturnsAsync((Room?)null);
 
         // Act
-        var result = await _service.DeleteAsync(id);
+        var result = await _roomService.DeleteAsync(id);
 
         // Assert
         Assert.That(result, Is.False);
 
-        _repository.Verify(x => x.DeleteAsync(It.IsAny<Room>()), Times.Never);
+        _roomRepository.Verify(x => x.DeleteAsync(It.IsAny<Room>()), Times.Never);
     }
 
     [TestCase(null)]
@@ -211,25 +396,25 @@ public class RoomServiceTests
     [TestCase("   ")]
     public void CreateAsync_WithInvalidName_ThrowsArgumentException(string? name)
     {
-        Assert.ThrowsAsync<ArgumentException>(async () => await _service.CreateAsync(name!, 10, 100m, new List<AdditionalServiceInput>()));
+        Assert.ThrowsAsync<ArgumentException>(async () => await _roomService.CreateAsync(name!, 10, 100m, new List<AdditionalServiceInput>()));
 
-        _repository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
+        _roomRepository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
     }
 
     [TestCase(0)]
     [TestCase(-1)]
     public void CreateAsync_WithInvalidCapacity_ThrowsArgumentOutOfRangeException(int capacity)
     {
-        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _service.CreateAsync("Room A", capacity, 100m, new List<AdditionalServiceInput>()));
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _roomService.CreateAsync("Room A", capacity, 100m, new List<AdditionalServiceInput>()));
 
-        _repository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
+        _roomRepository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
     }
 
     [Test]
     public void CreateAsync_WithNegativeHourlyRate_ThrowsArgumentOutOfRangeException()
     {
-        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _service.CreateAsync("Room A", 10, -1m, new List<AdditionalServiceInput>()));
-        _repository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _roomService.CreateAsync("Room A", 10, -1m, new List<AdditionalServiceInput>()));
+        _roomRepository.Verify(x => x.AddAsync(It.IsAny<Room>()), Times.Never);
     }
 
     [Test]
@@ -240,7 +425,7 @@ public class RoomServiceTests
             new AdditionalServiceInput("", 500m)
         };
 
-        Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync("Room A", 10, 100m, services));
+        Assert.ThrowsAsync<ArgumentException>(() => _roomService.CreateAsync("Room A", 10, 100m, services));
     }
 
     [Test]
@@ -251,7 +436,7 @@ public class RoomServiceTests
             new AdditionalServiceInput("Projector", -1m)
         };
 
-        Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.CreateAsync("Room A", 10, 100m, services));
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _roomService.CreateAsync("Room A", 10, 100m, services));
     }
 
     private static Room CreateRoom(string name = "Room A")

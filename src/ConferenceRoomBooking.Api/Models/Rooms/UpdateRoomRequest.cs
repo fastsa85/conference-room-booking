@@ -12,5 +12,7 @@ namespace ConferenceRoomBooking.Api.Models.Rooms
 
         [Range(0, double.MaxValue)]
         public decimal HourlyRate { get; set; }
+
+        public List<UpdateAdditionalServiceRequest> AvailableServices { get; set; } = [];
     }
 }

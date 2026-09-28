@@ -10,7 +10,7 @@ public interface IRoomService
 
     Task<Room> CreateAsync(string name, int capacity, decimal hourlyRate, IReadOnlyCollection<AdditionalServiceInput> availableServices);
 
-    Task<bool> UpdateAsync(Guid id, string name, int capacity, decimal hourlyRate);
+    Task<bool> UpdateAsync(Guid id, string name, int capacity, decimal hourlyRate, IReadOnlyCollection<UpdateAdditionalServiceInput> availableServices);
 
     Task<bool> DeleteAsync(Guid id);
 }

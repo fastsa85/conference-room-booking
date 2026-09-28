@@ -62,11 +62,19 @@ public class RoomsController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, UpdateRoomRequest request)
     {
+        var availableServices = request.AvailableServices
+        .Select(service => new UpdateAdditionalServiceInput(
+            service.Id,
+            service.Name,
+            service.Price))
+        .ToList();
+
         var updated = await _roomService.UpdateAsync(
             id,
             request.Name,
             request.Capacity,
-            request.HourlyRate);
+            request.HourlyRate,
+            availableServices);
 
         if (!updated)
         {

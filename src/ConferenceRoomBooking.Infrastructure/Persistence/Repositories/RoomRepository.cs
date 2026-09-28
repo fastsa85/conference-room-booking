@@ -25,7 +25,6 @@ public class RoomRepository : IRoomRepository
     {
         return await _dbContext.Rooms
             .Include(room => room.AvailableServices)
-            .AsNoTracking()
             .SingleOrDefaultAsync(room => room.Id == id);
     }
 
@@ -35,9 +34,21 @@ public class RoomRepository : IRoomRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Room room)
+    public async Task UpdateAsync(
+    Room room,
+    IReadOnlyCollection<AdditionalService>? servicesToAdd,
+    IReadOnlyCollection<AdditionalService>? servicesToRemove)
     {
-        _dbContext.Rooms.Update(room);
+        if (servicesToRemove is not null)
+        {
+            _dbContext.AdditionalServices.RemoveRange(servicesToRemove);
+        }
+
+        if (servicesToAdd is not null)
+        {
+            _dbContext.AdditionalServices.AddRange(servicesToAdd);
+        }
+
         await _dbContext.SaveChangesAsync();
     }
 
