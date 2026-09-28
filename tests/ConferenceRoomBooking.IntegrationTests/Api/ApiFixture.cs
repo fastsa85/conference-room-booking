@@ -77,6 +77,7 @@ public class ApiFixture : IAsyncDisposable
             .GetRequiredService<AppDbContext>();
 
         return await dbContext.Rooms
+            .Include(room => room.AvailableServices)
             .AsNoTracking()
             .SingleOrDefaultAsync(room => room.Id == id);
     }
