@@ -16,6 +16,7 @@ public class RoomRepository : IRoomRepository
     public async Task<IReadOnlyCollection<Room>> GetAllAsync()
     {
         return await _dbContext.Rooms
+            .Include(room => room.AvailableServices)
             .AsNoTracking()
             .ToListAsync();
     }
@@ -23,6 +24,7 @@ public class RoomRepository : IRoomRepository
     public async Task<Room?> GetByIdAsync(Guid id)
     {
         return await _dbContext.Rooms
+            .Include(room => room.AvailableServices)
             .AsNoTracking()
             .SingleOrDefaultAsync(room => room.Id == id);
     }
