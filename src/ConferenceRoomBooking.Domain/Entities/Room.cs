@@ -9,4 +9,6 @@ public class Room
     public decimal HourlyRate { get; set; }
 
     public ICollection<AdditionalService> AvailableServices { get; set; } = new List<AdditionalService>();
+
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }
