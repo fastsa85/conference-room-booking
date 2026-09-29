@@ -542,6 +542,23 @@ public class RoomRepositoryTests
         Assert.That(result.Single().Id, Is.EqualTo(room.Id));
     }
 
+    [Test]
+    public async Task GetAvailableAsync_WhenNoRoomsExist_ReturnsEmptyCollection()
+    {
+        await using var dbContext = _fixture.CreateDbContext();
+        var repository = new RoomRepository(dbContext);
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        var result = await repository.GetAvailableAsync(
+            start,
+            end,
+            capacity: 50);
+
+        Assert.That(result, Is.Empty);
+    }
+
     private static Room CreateRoom(string? name = null)
     {
         return new Room
