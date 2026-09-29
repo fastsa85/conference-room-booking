@@ -13,4 +13,6 @@ public interface IRoomService
     Task<bool> UpdateAsync(Guid id, string name, int capacity, decimal hourlyRate, IReadOnlyCollection<UpdateAdditionalServiceInput> availableServices);
 
     Task<bool> DeleteAsync(Guid id);
+
+    Task<IReadOnlyCollection<Room>> GetAvailableRoomsAsync(DateTime start, DateTime end, int capacity);
 }

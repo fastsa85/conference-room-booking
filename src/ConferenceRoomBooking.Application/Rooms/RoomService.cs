@@ -90,6 +90,13 @@ namespace ConferenceRoomBooking.Application.Rooms
             return true;
         }
 
+        public Task<IReadOnlyCollection<Room>> GetAvailableRoomsAsync(DateTime start, DateTime end, int capacity)
+        {
+            ValidateAvailabilitySearch(start, end, capacity);
+
+            return _roomRepository.GetAvailableAsync(start, end, capacity);
+        }
+
         private static HashSet<Guid> GetRequestedExistingServiceIds(IReadOnlyCollection<UpdateAdditionalServiceInput> availableServices)
         {
             return availableServices
@@ -207,6 +214,29 @@ namespace ConferenceRoomBooking.Application.Rooms
                 {
                     throw new ArgumentOutOfRangeException(nameof(availableServices), "Service price cannot be negative.");
                 }
+            }
+        }
+
+        private static void ValidateAvailabilitySearch(DateTime start, DateTime end, int capacity)
+        {
+            if (capacity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(capacity), "Capacity must be greater than zero.");
+            }
+
+            if (start >= end)
+            {
+                throw new ArgumentException("Start time must be before end time.");
+            }
+
+            if (start.Minute != 0 || end.Minute != 0)
+            {
+                throw new ArgumentException("Start and end time must be on full hours.");
+            }
+
+            if (start.Date != end.Date || start.TimeOfDay < TimeSpan.FromHours(6) || end.TimeOfDay > TimeSpan.FromHours(23))
+            {
+                throw new ArgumentException("Time range must be within 06:00–23:00.");
             }
         }
     }
