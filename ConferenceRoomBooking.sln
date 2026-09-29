@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.10.12217.157 stable
+VisualStudioVersion = 18.10.12217.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConferenceRoomBooking.Api", "src\ConferenceRoomBooking.Api\ConferenceRoomBooking.Api.csproj", "{F4DFAE79-CD9E-41FB-8546-6A0D9A1FDC1A}"
 EndProject
@@ -18,6 +18,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConferenceRoomBooking.UnitTests", "tests\ConferenceRoomBooking.UnitTests\ConferenceRoomBooking.UnitTests.csproj", "{8BAF41C3-0013-46C7-A835-A60555C18741}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConferenceRoomBooking.IntegrationTests", "tests\ConferenceRoomBooking.IntegrationTests\ConferenceRoomBooking.IntegrationTests.csproj", "{7B2E37DE-DE73-4FBC-BA20-7389ADFA0390}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{39A1F842-25DD-4C69-A4AE-C90ED6E7F988}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		docker-compose.e2e.yml = docker-compose.e2e.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConferenceRoomBooking.E2ETests", "tests\ConferenceRoomBooking.E2ETests\ConferenceRoomBooking.E2ETests.csproj", "{7067D53E-6458-60D3-C7C6-554EC956F52F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +109,18 @@ Global
 		{7B2E37DE-DE73-4FBC-BA20-7389ADFA0390}.Release|x64.Build.0 = Release|Any CPU
 		{7B2E37DE-DE73-4FBC-BA20-7389ADFA0390}.Release|x86.ActiveCfg = Release|Any CPU
 		{7B2E37DE-DE73-4FBC-BA20-7389ADFA0390}.Release|x86.Build.0 = Release|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Debug|x64.Build.0 = Debug|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Debug|x86.Build.0 = Debug|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Release|x64.ActiveCfg = Release|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Release|x64.Build.0 = Release|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Release|x86.ActiveCfg = Release|Any CPU
+		{7067D53E-6458-60D3-C7C6-554EC956F52F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,5 +132,9 @@ Global
 		{D2B2B340-8597-4F2C-B595-F8BE665F4533} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{8BAF41C3-0013-46C7-A835-A60555C18741} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{7B2E37DE-DE73-4FBC-BA20-7389ADFA0390} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{7067D53E-6458-60D3-C7C6-554EC956F52F} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F8DC7B3D-B253-4931-B09B-9BF4562BF858}
 	EndGlobalSection
 EndGlobal
