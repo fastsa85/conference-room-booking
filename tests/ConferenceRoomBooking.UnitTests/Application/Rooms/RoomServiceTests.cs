@@ -439,6 +439,114 @@ public class RoomServiceTests
         Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _roomService.CreateAsync("Room A", 10, 100m, services));
     }
 
+    [Test]
+    public async Task GetAvailableRoomsAsync_WithValidParameters_ReturnsAvailableRooms()
+    {
+        // Arrange
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+        const int capacity = 50;
+
+        var rooms = new List<Room>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Room A",
+                Capacity = 50,
+                HourlyRate = 2000m
+            }
+        };
+
+        _roomRepository
+            .Setup(repository => repository.GetAvailableAsync(start, end, capacity))
+            .ReturnsAsync(rooms);
+
+        // Act
+        var result = await _roomService.GetAvailableRoomsAsync(start, end, capacity);
+
+        // Assert
+        Assert.That(result, Is.SameAs(rooms));
+
+        _roomRepository.Verify(repository => repository.GetAvailableAsync(start, end, capacity), Times.Once);
+    }
+
+    [Test]
+    public void GetAvailableRoomsAsync_WhenCapacityIsZero_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act and Assert
+        Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+            async () => await _roomService.GetAvailableRoomsAsync(start, end, capacity: 0));
+
+        _roomRepository.Verify(
+            repository => repository.GetAvailableAsync(
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<int>()),
+            Times.Never);
+    }
+
+    [Test]
+    public void GetAvailableRoomsAsync_WhenStartIsAfterEnd_ThrowsArgumentException()
+    {
+        // Arrange
+        var start = new DateTime(2026, 10, 1, 14, 0, 0);
+        var end = new DateTime(2026, 10, 1, 10, 0, 0);
+
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentException>(
+            async () => await _roomService.GetAvailableRoomsAsync(start, end, capacity: 50));
+
+        _roomRepository.Verify(
+            repository => repository.GetAvailableAsync(
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<int>()),
+            Times.Never);
+    }
+
+    [Test]
+    public void GetAvailableRoomsAsync_WhenTimeIsNotOnFullHour_ThrowsArgumentException()
+    {
+        // Arrange
+        var start = new DateTime(2026, 10, 1, 10, 30, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentException>(
+            async () => await _roomService.GetAvailableRoomsAsync(
+                start,
+                end,
+                capacity: 50));
+
+        _roomRepository.Verify(
+            repository => repository.GetAvailableAsync(
+                It.IsAny<DateTime>(),
+                It.IsAny<DateTime>(),
+                It.IsAny<int>()),
+            Times.Never);
+    }
+
+    [Test]
+    public void GetAvailableRoomsAsync_WhenTimeIsOutsideBusinessHours_ThrowsArgumentException()
+    {
+        // Arrange
+        var start = new DateTime(2026, 10, 1, 5, 0, 0);
+        var end = new DateTime(2026, 10, 1, 10, 0, 0);
+
+        // Act and Assert
+        Assert.ThrowsAsync<ArgumentException>(
+            async () => await _roomService.GetAvailableRoomsAsync(start, end, capacity: 50));
+
+        _roomRepository.Verify(
+            repository => repository.GetAvailableAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()),
+            Times.Never);
+    }
+
     private static Room CreateRoom(string name = "Room A")
     {
         return new Room

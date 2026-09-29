@@ -1,5 +1,6 @@
 ﻿using ConferenceRoomBooking.Application.Rooms;
 using ConferenceRoomBooking.Domain.Entities;
+using ConferenceRoomBooking.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConferenceRoomBooking.Infrastructure.Persistence.Repositories;
@@ -50,6 +51,18 @@ public class RoomRepository : IRoomRepository
         }
 
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IReadOnlyCollection<Room>> GetAvailableAsync(DateTime start, DateTime end, int capacity)
+    {
+        return await _dbContext.Rooms.Where(room =>
+            room.Capacity >= capacity &&
+            !room.Bookings.Any(booking =>
+                booking.Status == BookingStatus.Confirmed &&
+                booking.Start < end &&
+                booking.End > start))
+        .Include(room => room.AvailableServices)
+        .ToListAsync();
     }
 
     public async Task DeleteAsync(Room room)

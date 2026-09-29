@@ -5,12 +5,21 @@ namespace ConferenceRoomBooking.Application.Rooms
     public interface IRoomRepository
     {
         Task<IReadOnlyCollection<Room>> GetAllAsync();
+
         Task<Room?> GetByIdAsync(Guid id);
+
         Task AddAsync(Room room);
+
         Task UpdateAsync(
             Room room,
             IReadOnlyCollection<AdditionalService>? servicesToAdd,
             IReadOnlyCollection<AdditionalService>? servicesToRemove);
+
         Task DeleteAsync(Room room);
+
+        Task<IReadOnlyCollection<Room>> GetAvailableAsync(
+            DateTime start,
+             DateTime end,
+            int capacity);
     }
 }

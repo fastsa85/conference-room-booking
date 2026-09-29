@@ -663,4 +663,82 @@ public class RoomsControllerTests
             response.StatusCode,
             Is.EqualTo(HttpStatusCode.NotFound));
     }
+
+    // GET /api/rooms/available
+
+    [Test]
+    public async Task GetAvailableRooms_WhenRoomIsAvailable_ReturnsRoom()
+    {
+        // Arrange
+        var room = new Room
+        {
+            Id = Guid.NewGuid(),
+            Name = "Meeting Room A",
+            Capacity = 50,
+            HourlyRate = 2000m,
+            AvailableServices =
+            [
+                new AdditionalService
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Projector",
+                    Price = 500m
+                }
+            ]
+        };
+
+        await _fixture.AddRoomAsync(room);
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act
+        var response = await _fixture.Client.GetAsync(
+            $"/api/rooms/available" +
+            $"?start={start:yyyy-MM-ddTHH:mm:ss}" +
+            $"&end={end:yyyy-MM-ddTHH:mm:ss}" +
+            $"&capacity=50");
+
+        // Assert
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var rooms = await response.Content.ReadFromJsonAsync<List<RoomResponse>>();
+
+        Assert.That(rooms, Is.Not.Null);
+        Assert.That(rooms, Has.Count.EqualTo(1));
+
+        var returnedRoom = rooms!.Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(returnedRoom.Id, Is.EqualTo(room.Id));
+            Assert.That(returnedRoom.Name, Is.EqualTo(room.Name));
+            Assert.That(returnedRoom.Capacity, Is.EqualTo(room.Capacity));
+            Assert.That(returnedRoom.HourlyRate, Is.EqualTo(room.HourlyRate));
+
+            Assert.That(returnedRoom.AvailableServices, Has.Count.EqualTo(1));
+
+            Assert.That(returnedRoom.AvailableServices.Single().Name, Is.EqualTo("Projector"));
+
+            Assert.That(returnedRoom.AvailableServices.Single().Price, Is.EqualTo(500m));
+        });
+    }
+
+    [Test]
+    public async Task GetAvailableRooms_WithInvalidCapacity_ReturnsBadRequest()
+    {
+        // Arrange
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act
+        var response = await _fixture.Client.GetAsync(
+            $"/api/rooms/available" +
+            $"?start={start:yyyy-MM-ddTHH:mm:ss}" +
+            $"&end={end:yyyy-MM-ddTHH:mm:ss}" +
+            $"&capacity=0"); // !
+
+        // Assert
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+    }
 }

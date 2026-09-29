@@ -1,4 +1,5 @@
 ﻿using ConferenceRoomBooking.Domain.Entities;
+using ConferenceRoomBooking.Domain.Enums;
 using ConferenceRoomBooking.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace ConferenceRoomBooking.IntegrationTests.Infrastructure.Repositories;
 public class RoomRepositoryTests
 {
     private SqlServerFixture _fixture = null!;
+    private DatabaseCleaner _databaseCleaner = null!;
 
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
@@ -19,6 +21,8 @@ public class RoomRepositoryTests
 
         await using var dbContext = _fixture.CreateDbContext();
         await dbContext.Database.MigrateAsync();
+
+        _databaseCleaner = new DatabaseCleaner(_fixture.ConnectionString);
     }
 
     [OneTimeTearDown]
@@ -30,8 +34,7 @@ public class RoomRepositoryTests
     [SetUp]
     public async Task SetUp()
     {
-        await using var dbContext = _fixture.CreateDbContext();
-        await dbContext.Rooms.ExecuteDeleteAsync();
+        await _databaseCleaner.CleanAsync();
     }
 
     [Test]
@@ -369,6 +372,191 @@ public class RoomRepositoryTests
         var exists = await assertContext.Rooms.AnyAsync(x => x.Id == room.Id);
 
         Assert.That(exists, Is.False);
+    }
+
+    [Test]
+    public async Task GetAvailableAsync_WhenRoomHasEnoughCapacityAndNoBookings_ReturnsRoom()
+    {
+        // Arrange
+        await using var dbContext = _fixture.CreateDbContext();
+        var repository = new RoomRepository(dbContext);
+
+        var room = CreateRoom();
+        room.Capacity = 50;
+
+        await repository.AddAsync(room);
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act
+        var result = await repository.GetAvailableAsync(
+            start,
+            end,
+            capacity: 50);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result.Single().Id, Is.EqualTo(room.Id));
+    }
+
+    [Test]
+    public async Task GetAvailableAsync_WhenRoomCapacityIsTooSmall_DoesNotReturnRoom()
+    {
+        // Arrange
+        await using var dbContext = _fixture.CreateDbContext();
+        var repository = new RoomRepository(dbContext);
+
+        var room = CreateRoom();
+        room.Capacity = 49;
+
+        await repository.AddAsync(room);
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act
+        var result = await repository.GetAvailableAsync(
+            start,
+            end,
+            capacity: 50);
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAvailableAsync_WhenConfirmedBookingOverlaps_DoesNotReturnRoom()
+    {
+        // Arrange
+        await using var dbContext = _fixture.CreateDbContext();
+        var repository = new RoomRepository(dbContext);
+
+        var room = CreateRoom();
+        room.Capacity = 50;
+
+        await repository.AddAsync(room);
+
+        var booking = new Booking
+        {
+            Id = Guid.NewGuid(),
+            RoomId = room.Id,
+            Status = BookingStatus.Confirmed,
+            Start = new DateTime(2026, 10, 1, 11, 0, 0),
+            End = new DateTime(2026, 10, 1, 13, 0, 0),
+            TotalCost = 4000m
+        };
+
+        dbContext.Bookings.Add(booking);
+        await dbContext.SaveChangesAsync();
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act
+        var result = await repository.GetAvailableAsync(
+            start,
+            end,
+            capacity: 50);
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    [TestCase(8, 10)]
+    [TestCase(14, 16)]
+    public async Task GetAvailableAsync_WhenConfirmedBookingTouchesBoundary_ReturnsRoom(int bookingStartHour, int bookingEndHour)
+    {
+        // Arrange
+        await using var dbContext = _fixture.CreateDbContext();
+        var repository = new RoomRepository(dbContext);
+
+        var room = CreateRoom();
+        room.Capacity = 50;
+
+        await repository.AddAsync(room);
+
+        var booking = new Booking
+        {
+            Id = Guid.NewGuid(),
+            RoomId = room.Id,
+            Status = BookingStatus.Confirmed,
+            Start = new DateTime(2026, 10, 1, bookingStartHour, 0, 0),
+            End = new DateTime(2026, 10, 1, bookingEndHour, 0, 0),
+            TotalCost = 2000m
+        };
+
+        dbContext.Bookings.Add(booking);
+        await dbContext.SaveChangesAsync();
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act
+        var result = await repository.GetAvailableAsync(
+            start,
+            end,
+            capacity: 50);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result.Single().Id, Is.EqualTo(room.Id));
+    }
+
+    [Test]
+    public async Task GetAvailableAsync_WhenCancelledBookingOverlaps_ReturnsRoom()
+    {
+        // Arrange
+        await using var dbContext = _fixture.CreateDbContext();
+        var repository = new RoomRepository(dbContext);
+
+        var room = CreateRoom();
+        room.Capacity = 50;
+
+        await repository.AddAsync(room);
+
+        var booking = new Booking
+        {
+            Id = Guid.NewGuid(),
+            RoomId = room.Id,
+            Status = BookingStatus.Cancelled,
+            Start = new DateTime(2026, 10, 1, 11, 0, 0),
+            End = new DateTime(2026, 10, 1, 13, 0, 0),
+            TotalCost = 4000m
+        };
+
+        dbContext.Bookings.Add(booking);
+        await dbContext.SaveChangesAsync();
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        // Act
+        var result = await repository.GetAvailableAsync(
+            start,
+            end,
+            capacity: 50);
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result.Single().Id, Is.EqualTo(room.Id));
+    }
+
+    [Test]
+    public async Task GetAvailableAsync_WhenNoRoomsExist_ReturnsEmptyCollection()
+    {
+        await using var dbContext = _fixture.CreateDbContext();
+        var repository = new RoomRepository(dbContext);
+
+        var start = new DateTime(2026, 10, 1, 10, 0, 0);
+        var end = new DateTime(2026, 10, 1, 14, 0, 0);
+
+        var result = await repository.GetAvailableAsync(
+            start,
+            end,
+            capacity: 50);
+
+        Assert.That(result, Is.Empty);
     }
 
     private static Room CreateRoom(string? name = null)

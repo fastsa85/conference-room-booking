@@ -97,6 +97,21 @@ public class RoomsController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("available")]
+    public async Task<IActionResult> GetAvailable([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int capacity)
+    {
+        try
+        {
+            var rooms = await _roomService.GetAvailableRoomsAsync(start, end, capacity);
+
+            return Ok(rooms.Select(ToResponse));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     private static RoomResponse ToResponse(Room room)
     {
         return new RoomResponse
