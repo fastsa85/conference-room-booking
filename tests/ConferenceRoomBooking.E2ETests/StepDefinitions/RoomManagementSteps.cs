@@ -8,6 +8,9 @@ namespace ConferenceRoomBooking.E2ETests.StepDefinitions;
 [Binding]
 public class RoomManagementSteps
 {
+    private const string RoomsEndpoint = "/api/rooms";
+    private const string AvailableRoomsEndpoint = "/api/rooms/available";
+
     private readonly RoomTestContext _context;
 
     public RoomManagementSteps(RoomTestContext context)
@@ -47,9 +50,7 @@ public class RoomManagementSteps
     {
         Assert.That(_context.RoomRequest, Is.Not.Null);
 
-        _context.Response = await _context.HttpClient.PostAsJsonAsync(
-            "/api/rooms",
-            _context.RoomRequest);
+        _context.Response = await _context.HttpClient.PostAsJsonAsync(RoomsEndpoint, _context.RoomRequest);
 
         if (_context.Response.IsSuccessStatusCode)
         {
@@ -69,7 +70,7 @@ public class RoomManagementSteps
     public async Task WhenTheClientRequestsAllRooms()
     {
         _context.Response =
-            await _context.HttpClient.GetAsync("/api/rooms");
+            await _context.HttpClient.GetAsync(RoomsEndpoint);
 
         if (_context.Response.IsSuccessStatusCode)
         {
@@ -84,7 +85,7 @@ public class RoomManagementSteps
     {
         Assert.That(_context.RoomId, Is.Not.Null);
 
-        _context.Response = await _context.HttpClient.GetAsync($"/api/rooms/{_context.RoomId}");
+        _context.Response = await _context.HttpClient.GetAsync($"{RoomsEndpoint}/{_context.RoomId}");
 
         if (_context.Response.IsSuccessStatusCode)
         {
@@ -120,7 +121,7 @@ public class RoomManagementSteps
                 .ToList()
         };
 
-        _context.Response = await _context.HttpClient.PutAsJsonAsync($"/api/rooms/{_context.RoomId}", updateRequest);
+        _context.Response = await _context.HttpClient.PutAsJsonAsync($"{RoomsEndpoint}/{_context.RoomId}", updateRequest);
     }
 
     [When("the client deletes the room")]
@@ -128,7 +129,7 @@ public class RoomManagementSteps
     {
         Assert.That(_context.RoomId, Is.Not.Null);
 
-        _context.Response = await _context.HttpClient.DeleteAsync($"/api/rooms/{_context.RoomId}");
+        _context.Response = await _context.HttpClient.DeleteAsync($"{RoomsEndpoint}/{_context.RoomId}");
     }
 
     [When(@"the client requests the room ""(.*)""")]
@@ -138,8 +139,7 @@ public class RoomManagementSteps
 
         var roomId = _context.RoomIds[roomName];
 
-        _context.Response = await _context.HttpClient.GetAsync(
-            $"/api/rooms/{roomId}");
+        _context.Response = await _context.HttpClient.GetAsync($"{RoomsEndpoint}/{roomId}");
 
         if (_context.Response.IsSuccessStatusCode)
         {
@@ -156,11 +156,7 @@ public class RoomManagementSteps
         var end = DateTime.Parse(row["End"]);
         var capacity = int.Parse(row["Capacity"]);
 
-        var url =
-            $"/api/rooms/available" +
-            $"?start={start:yyyy-MM-ddTHH:mm:ss}" +
-            $"&end={end:yyyy-MM-ddTHH:mm:ss}" +
-            $"&capacity={capacity}";
+        var url = $"{AvailableRoomsEndpoint}?start={start:yyyy-MM-ddTHH:mm:ss}&end={end:yyyy-MM-ddTHH:mm:ss}&capacity={capacity}";
 
         _context.Response = await _context.HttpClient.GetAsync(url);
 
