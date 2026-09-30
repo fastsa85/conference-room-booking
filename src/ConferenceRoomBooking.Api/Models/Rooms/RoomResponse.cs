@@ -1,5 +1,4 @@
-﻿namespace ConferenceRoomBooking.Api.Models.Rooms
-{
+﻿namespace ConferenceRoomBooking.Api.Models.Rooms;
     public class RoomResponse
     {
         public Guid Id { get; set; }
@@ -9,4 +8,3 @@
 
         public List<AdditionalServiceResponse> AvailableServices { get; set; } = [];
     }
-}

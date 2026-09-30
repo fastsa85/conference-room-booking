@@ -1,5 +1,3 @@
-using System;
-
 namespace ConferenceRoomBooking.Application.Pricing;
 
 public class PricingService : IPricingService

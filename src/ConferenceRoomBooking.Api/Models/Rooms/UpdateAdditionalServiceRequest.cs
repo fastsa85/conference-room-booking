@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ConferenceRoomBooking.Api.Models.Rooms
+namespace ConferenceRoomBooking.Api.Models.Rooms;
+
+public class UpdateAdditionalServiceRequest
 {
-    public class UpdateAdditionalServiceRequest
-    {
-        public Guid? Id { get; set; }
+    public Guid? Id { get; set; }
 
-        [Required]
-        public string Name { get; set; } = null!;
+    [Required]
+    public string Name { get; set; } = null!;
 
-        [Range(0, double.MaxValue)]
-        public decimal Price { get; set; }
-    }
+    [Range(0, double.MaxValue)]
+    public decimal Price { get; set; }
 }
+

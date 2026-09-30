@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Respawn;
 
-namespace ConferenceRoomBooking.E2ETests.Support.Models
+namespace ConferenceRoomBooking.E2ETests.Support
 {
     public class DatabaseCleaner
     {

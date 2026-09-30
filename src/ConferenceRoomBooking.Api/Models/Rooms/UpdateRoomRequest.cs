@@ -1,18 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ConferenceRoomBooking.Api.Models.Rooms
+namespace ConferenceRoomBooking.Api.Models.Rooms;
+
+public class UpdateRoomRequest
 {
-    public class UpdateRoomRequest
-    {
-        [Required]
-        public string Name { get; set; } = null!;
+    [Required]
+    public string Name { get; set; } = null!;
 
-        [Range(1, int.MaxValue)]
-        public int Capacity { get; set; }
+    [Range(1, int.MaxValue)]
+    public int Capacity { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public decimal HourlyRate { get; set; }
+    [Range(0, double.MaxValue)]
+    public decimal HourlyRate { get; set; }
 
-        public List<UpdateAdditionalServiceRequest> AvailableServices { get; set; } = [];
-    }
+    public List<UpdateAdditionalServiceRequest> AvailableServices { get; set; } = [];
 }

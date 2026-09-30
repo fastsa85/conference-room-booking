@@ -1,8 +1,6 @@
-using System;
-
 namespace ConferenceRoomBooking.Application.Pricing;
 
-internal record PricingSegment(
+public record PricingSegment(
     DateTime Start,
     DateTime End,
     decimal Multiplier);

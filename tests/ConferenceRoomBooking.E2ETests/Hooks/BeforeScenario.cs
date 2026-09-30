@@ -1,4 +1,4 @@
-﻿using ConferenceRoomBooking.E2ETests.Support.Models;
+﻿using ConferenceRoomBooking.E2ETests.Support;
 
 namespace ConferenceRoomBooking.E2ETests.Hooks
 {
