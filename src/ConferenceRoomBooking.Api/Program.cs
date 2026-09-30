@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
@@ -21,6 +22,13 @@ builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<BookingValidator>();
 
 var app = builder.Build();
+
+app.MapOpenApi();
+
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/openapi/v1.json", "Conference Room Booking API v1");
+});
 
 using (var scope = app.Services.CreateScope())
 {
