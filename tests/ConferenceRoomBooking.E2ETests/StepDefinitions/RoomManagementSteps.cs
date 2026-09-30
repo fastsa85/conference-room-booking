@@ -245,4 +245,16 @@ public class RoomManagementSteps
             actualRoomNames,
             Is.EquivalentTo(expectedRoomNames));
     }
+
+    [Then("the room {string} should not be returned")]
+    public void ThenTheRoomShouldNotBeReturned(string roomName)
+    {
+        Assert.That(
+            _context.RoomsResponse,
+            Is.Not.Null);
+
+        Assert.That(
+            _context.RoomsResponse!.Any(room => room.Name == roomName),
+            Is.False);
+    }
 }

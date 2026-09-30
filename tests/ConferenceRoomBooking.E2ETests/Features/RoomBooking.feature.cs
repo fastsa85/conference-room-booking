@@ -27,7 +27,7 @@ namespace ConferenceRoomBooking.E2ETests.Features
         
         private static string[] featureTags = ((string[])(null));
         
-        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features", "Room booking", null, global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
+        private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features", "Room booking", "", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags, InitializeCucumberMessages());
         
 #line 1 "RoomBooking.feature"
 #line hidden
@@ -105,7 +105,7 @@ namespace ConferenceRoomBooking.E2ETests.Features
         
         private static global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages InitializeCucumberMessages()
         {
-            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/RoomBooking.feature.ndjson", 3);
+            return new global::Reqnroll.Formatters.RuntimeSupport.FeatureLevelCucumberMessages("Features/RoomBooking.feature.ndjson", 5);
         }
         
         [global::NUnit.Framework.TestAttribute()]
@@ -118,7 +118,7 @@ namespace ConferenceRoomBooking.E2ETests.Features
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Book a conference room with additional services", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 3
+#line 6
 this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -136,7 +136,7 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                             "Meeting Room",
                             "10",
                             "100"});
-#line 4
+#line 7
     await testRunner.GivenAsync("a room with the following details", ((string)(null)), table5, "Given ");
 #line hidden
                 global::Reqnroll.Table table6 = new global::Reqnroll.Table(new string[] {
@@ -148,13 +148,13 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                 table6.AddRow(new string[] {
                             "Catering",
                             "100"});
-#line 7
+#line 10
     await testRunner.AndAsync("the room has the following services", ((string)(null)), table6, "And ");
 #line hidden
-#line 11
+#line 14
     await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 12
+#line 15
     await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
                 global::Reqnroll.Table table7 = new global::Reqnroll.Table(new string[] {
@@ -165,17 +165,158 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                             "2026-10-01 10:00",
                             "2026-10-01 12:00",
                             "Projector, Catering"});
-#line 14
+#line 17
     await testRunner.WhenAsync("the client books the room", ((string)(null)), table7, "When ");
 #line hidden
-#line 18
+#line 21
     await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 19
+#line 22
     await testRunner.AndAsync("the booking should have total cost 350", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 20
+#line 23
     await testRunner.AndAsync("the booking status should be \"Confirmed\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::NUnit.Framework.TestAttribute()]
+        [global::NUnit.Framework.DescriptionAttribute("Booked room is not available for overlapping time")]
+        public async global::System.Threading.Tasks.Task BookedRoomIsNotAvailableForOverlappingTime()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "1";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Booked room is not available for overlapping time", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 25
+this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+                global::Reqnroll.Table table8 = new global::Reqnroll.Table(new string[] {
+                            "Name",
+                            "Capacity",
+                            "HourlyRate"});
+                table8.AddRow(new string[] {
+                            "Meeting Room",
+                            "10",
+                            "100"});
+#line 26
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table8, "Given ");
+#line hidden
+#line 29
+    await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 30
+    await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+                global::Reqnroll.Table table9 = new global::Reqnroll.Table(new string[] {
+                            "Start",
+                            "End",
+                            "Services"});
+                table9.AddRow(new string[] {
+                            "2026-10-01 10:00",
+                            "2026-10-01 12:00",
+                            ""});
+#line 32
+    await testRunner.WhenAsync("the client books the room", ((string)(null)), table9, "When ");
+#line hidden
+#line 35
+    await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+                global::Reqnroll.Table table10 = new global::Reqnroll.Table(new string[] {
+                            "Start",
+                            "End",
+                            "Capacity"});
+                table10.AddRow(new string[] {
+                            "2026-10-01 11:00",
+                            "2026-10-01 13:00",
+                            "10"});
+#line 37
+    await testRunner.WhenAsync("the client searches for available rooms", ((string)(null)), table10, "When ");
+#line hidden
+#line 40
+    await testRunner.ThenAsync("the response status code should be 200", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+#line 41
+    await testRunner.AndAsync("the room \"Meeting Room\" should not be returned", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+#line hidden
+            }
+            await this.ScenarioCleanupAsync();
+        }
+        
+        [global::NUnit.Framework.TestAttribute()]
+        [global::NUnit.Framework.DescriptionAttribute("Overlapping booking is rejected")]
+        public async global::System.Threading.Tasks.Task OverlappingBookingIsRejected()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
+            string pickleIndex = "2";
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Overlapping booking is rejected", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
+            string[] tagsOfRule = ((string[])(null));
+            global::Reqnroll.RuleInfo ruleInfo = null;
+#line 43
+this.ScenarioInitialize(scenarioInfo, ruleInfo);
+#line hidden
+            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                await testRunner.SkipScenarioAsync();
+            }
+            else
+            {
+                await this.ScenarioStartAsync();
+                global::Reqnroll.Table table11 = new global::Reqnroll.Table(new string[] {
+                            "Name",
+                            "Capacity",
+                            "HourlyRate"});
+                table11.AddRow(new string[] {
+                            "Meeting Room",
+                            "10",
+                            "100"});
+#line 44
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table11, "Given ");
+#line hidden
+#line 47
+    await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+#line hidden
+#line 48
+    await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+                global::Reqnroll.Table table12 = new global::Reqnroll.Table(new string[] {
+                            "Start",
+                            "End",
+                            "Services"});
+                table12.AddRow(new string[] {
+                            "2026-10-01 10:00",
+                            "2026-10-01 12:00",
+                            ""});
+#line 50
+    await testRunner.WhenAsync("the client books the room", ((string)(null)), table12, "When ");
+#line hidden
+#line 53
+    await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line hidden
+                global::Reqnroll.Table table13 = new global::Reqnroll.Table(new string[] {
+                            "Start",
+                            "End",
+                            "Services"});
+                table13.AddRow(new string[] {
+                            "2026-10-01 11:00",
+                            "2026-10-01 13:00",
+                            ""});
+#line 55
+    await testRunner.WhenAsync("the client books the room", ((string)(null)), table13, "When ");
+#line hidden
+#line 58
+    await testRunner.ThenAsync("the response status code should be 409", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
