@@ -11,6 +11,9 @@ namespace ConferenceRoomBooking.IntegrationTests.Api;
 [Category("ApiIntegration")]
 public class RoomsControllerTests
 {
+    private const string RoomsEndpoint = "/api/rooms";
+    private const string AvailableRoomsEndpoint = "/api/rooms/available";
+
     private ApiFixture _fixture = null!;
 
     [OneTimeSetUp]
@@ -46,9 +49,7 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/rooms",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(RoomsEndpoint, request);
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -67,9 +68,7 @@ public class RoomsControllerTests
             Assert.That(created.HourlyRate, Is.EqualTo(request.HourlyRate));
 
             Assert.That(response.Headers.Location, Is.Not.Null);
-            Assert.That(
-                response.Headers.Location!.AbsolutePath,
-                Is.EqualTo($"/api/rooms/{created.Id}"));
+            Assert.That(response.Headers.Location!.AbsolutePath, Is.EqualTo($"{RoomsEndpoint}/{created.Id}"));
         });
 
         var persistedRoom = await _fixture.GetRoomAsync(created.Id);
@@ -109,7 +108,7 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync("/api/rooms", request);
+        var response = await _fixture.Client.PostAsJsonAsync(RoomsEndpoint, request);
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -137,8 +136,7 @@ public class RoomsControllerTests
                 Is.True);
         });
 
-        var persistedRoom =
-            await _fixture.GetRoomAsync(createdRoom!.Id);
+        var persistedRoom = await _fixture.GetRoomAsync(createdRoom!.Id);
 
         Assert.That(persistedRoom, Is.Not.Null);
 
@@ -204,14 +202,10 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/rooms",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(RoomsEndpoint, request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [TestCase("", 500)]
@@ -234,7 +228,7 @@ public class RoomsControllerTests
             }
         };
 
-        var response = await _fixture.Client.PostAsJsonAsync("/api/rooms", request);
+        var response = await _fixture.Client.PostAsJsonAsync(RoomsEndpoint, request);
 
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
@@ -256,15 +250,12 @@ public class RoomsControllerTests
         await _fixture.AddRoomAsync(room);
 
         // Act
-        var response = await _fixture.Client.GetAsync(
-            $"/api/rooms/{room.Id}");
+        var response = await _fixture.Client.GetAsync($"{RoomsEndpoint}/{room.Id}");
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
-        Assert.That(
-            response.Content.Headers.ContentType?.MediaType,
-            Is.EqualTo("application/json"));
+        Assert.That(response.Content.Headers.ContentType?.MediaType, Is.EqualTo("application/json"));
 
         var returnedRoom = await response.Content.ReadFromJsonAsync<RoomResponse>();
 
@@ -288,13 +279,10 @@ public class RoomsControllerTests
         var roomId = Guid.NewGuid();
 
         // Act
-        var response = await _fixture.Client.GetAsync(
-            $"/api/rooms/{roomId}");
+        var response = await _fixture.Client.GetAsync($"{RoomsEndpoint}/{roomId}");
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
     // GET /api/rooms
@@ -323,7 +311,7 @@ public class RoomsControllerTests
         await _fixture.AddRoomAsync(room2);
 
         // Act
-        var response = await _fixture.Client.GetAsync("/api/rooms");
+        var response = await _fixture.Client.GetAsync(RoomsEndpoint);
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -357,7 +345,7 @@ public class RoomsControllerTests
     public async Task GetAllRooms_WhenNoRoomsExist_ReturnsEmptyCollection()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/api/rooms");
+        var response = await _fixture.Client.GetAsync(RoomsEndpoint);
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -392,14 +380,10 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PutAsJsonAsync(
-            $"/api/rooms/{room.Id}",
-            request);
+        var response = await _fixture.Client.PutAsJsonAsync($"{RoomsEndpoint}/{room.Id}", request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.NoContent));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
         var updatedRoom = await _fixture.GetRoomAsync(room.Id);
 
@@ -469,7 +453,7 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PutAsJsonAsync($"/api/rooms/{room.Id}", request);
+        var response = await _fixture.Client.PutAsJsonAsync($"{RoomsEndpoint}/{room.Id}", request);
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
@@ -479,11 +463,8 @@ public class RoomsControllerTests
         Assert.That(persistedRoom, Is.Not.Null);
         Assert.That(persistedRoom!.AvailableServices, Has.Count.EqualTo(2));
 
-        var projector = persistedRoom.AvailableServices
-            .Single(service => service.Id == projectorId);
-
-        var sound = persistedRoom.AvailableServices
-            .Single(service => service.Name == "Sound");
+        var projector = persistedRoom.AvailableServices.Single(service => service.Id == projectorId);
+        var sound = persistedRoom.AvailableServices.Single(service => service.Name == "Sound");
 
         Assert.Multiple(() =>
         {
@@ -518,14 +499,10 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PutAsJsonAsync(
-            $"/api/rooms/{roomId}",
-            request);
+        var response = await _fixture.Client.PutAsJsonAsync($"{RoomsEndpoint}/{roomId}", request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
     [TestCase("", 10, 100)]
@@ -554,14 +531,10 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PutAsJsonAsync(
-            $"/api/rooms/{room.Id}",
-            request);
+        var response = await _fixture.Client.PutAsJsonAsync($"{RoomsEndpoint}/{room.Id}", request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode,Is.EqualTo(HttpStatusCode.BadRequest));
 
         var persistedRoom = await _fixture.GetRoomAsync(room.Id);
 
@@ -597,14 +570,10 @@ public class RoomsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PutAsJsonAsync(
-            $"/api/rooms/{room.Id}",
-            request);
+        var response = await _fixture.Client.PutAsJsonAsync($"{RoomsEndpoint}/{room.Id}", request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
 
         var persistedRoom = await _fixture.GetRoomAsync(room.Id);
 
@@ -635,13 +604,10 @@ public class RoomsControllerTests
         await _fixture.AddRoomAsync(room);
 
         // Act
-        var response = await _fixture.Client.DeleteAsync(
-            $"/api/rooms/{room.Id}");
+        var response = await _fixture.Client.DeleteAsync($"{RoomsEndpoint}/{room.Id}");
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.NoContent));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
         var deletedRoom = await _fixture.GetRoomAsync(room.Id);
 
@@ -655,13 +621,10 @@ public class RoomsControllerTests
         var roomId = Guid.NewGuid();
 
         // Act
-        var response = await _fixture.Client.DeleteAsync(
-            $"/api/rooms/{roomId}");
+        var response = await _fixture.Client.DeleteAsync($"{RoomsEndpoint}/{roomId}");
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
     // GET /api/rooms/available
@@ -693,11 +656,7 @@ public class RoomsControllerTests
         var end = new DateTime(2026, 10, 1, 14, 0, 0);
 
         // Act
-        var response = await _fixture.Client.GetAsync(
-            $"/api/rooms/available" +
-            $"?start={start:yyyy-MM-ddTHH:mm:ss}" +
-            $"&end={end:yyyy-MM-ddTHH:mm:ss}" +
-            $"&capacity=50");
+        var response = await _fixture.Client.GetAsync($"{AvailableRoomsEndpoint}?start={start:yyyy-MM-ddTHH:mm:ss}&end={end:yyyy-MM-ddTHH:mm:ss}&capacity=50");
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -732,11 +691,7 @@ public class RoomsControllerTests
         var end = new DateTime(2026, 10, 1, 14, 0, 0);
 
         // Act
-        var response = await _fixture.Client.GetAsync(
-            $"/api/rooms/available" +
-            $"?start={start:yyyy-MM-ddTHH:mm:ss}" +
-            $"&end={end:yyyy-MM-ddTHH:mm:ss}" +
-            $"&capacity=0"); // !
+        var response = await _fixture.Client.GetAsync($"{AvailableRoomsEndpoint}?start={start:yyyy-MM-ddTHH:mm:ss}&end={end:yyyy-MM-ddTHH:mm:ss}&capacity=0"); // !
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));

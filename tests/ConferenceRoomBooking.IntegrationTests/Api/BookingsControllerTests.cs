@@ -10,6 +10,7 @@ namespace ConferenceRoomBooking.IntegrationTests.Api;
 [Category("ApiIntegration")]
 public class BookingsControllerTests
 {
+    private const string BookingsEndpoint = "/api/bookings";
     private ApiFixture _fixture = null!;
 
     [OneTimeSetUp]
@@ -50,17 +51,12 @@ public class BookingsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/bookings",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(BookingsEndpoint, request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.Created));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
 
-        var booking =
-            await response.Content.ReadFromJsonAsync<BookingResponse>();
+        var booking = await response.Content.ReadFromJsonAsync<BookingResponse>();
 
         Assert.That(booking, Is.Not.Null);
 
@@ -114,9 +110,7 @@ public class BookingsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/bookings",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(BookingsEndpoint, request);
 
         // Assert
         Assert.That(
@@ -185,14 +179,10 @@ public class BookingsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/bookings",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(BookingsEndpoint, request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -215,14 +205,10 @@ public class BookingsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/bookings",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(BookingsEndpoint, request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -252,9 +238,7 @@ public class BookingsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/bookings",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(BookingsEndpoint, request);
 
         // Assert
         Assert.That(
@@ -289,14 +273,10 @@ public class BookingsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/bookings",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(BookingsEndpoint, request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.Created));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
     }
 
     [Test]
@@ -316,14 +296,10 @@ public class BookingsControllerTests
         };
 
         // Act
-        var response = await _fixture.Client.PostAsJsonAsync(
-            "/api/bookings",
-            request);
+        var response = await _fixture.Client.PostAsJsonAsync(BookingsEndpoint, request);
 
         // Assert
-        Assert.That(
-            response.StatusCode,
-            Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     private static Room CreateRoom()

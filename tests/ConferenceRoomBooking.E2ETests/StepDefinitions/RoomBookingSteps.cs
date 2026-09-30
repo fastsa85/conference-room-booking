@@ -8,6 +8,7 @@ namespace ConferenceRoomBooking.E2ETests.StepDefinitions;
 [Binding]
 public class RoomBookingSteps
 {
+    private const string BookingsEndpoint = "/api/bookings";
     private readonly RoomTestContext _context;
 
     public RoomBookingSteps(RoomTestContext context)
@@ -51,7 +52,7 @@ public class RoomBookingSteps
             AdditionalServiceIds = serviceIds
         };
 
-        _context.Response = await _context.HttpClient.PostAsJsonAsync("/api/bookings", request);
+        _context.Response = await _context.HttpClient.PostAsJsonAsync(BookingsEndpoint, request);
 
         if (_context.Response.IsSuccessStatusCode)
         {
