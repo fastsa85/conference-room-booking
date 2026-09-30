@@ -1,9 +1,9 @@
 ﻿using ConferenceRoomBooking.Domain.Entities;
 using ConferenceRoomBooking.Infrastructure.Persistence;
+using ConferenceRoomBooking.TestInfrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Testcontainers.MsSql;
 
 namespace ConferenceRoomBooking.IntegrationTests.Api;
@@ -26,14 +26,14 @@ public class ApiFixture : IAsyncDisposable
             {
                 builder.ConfigureServices(services =>
                 {
-                    var descriptor = services.SingleOrDefault(service =>service.ServiceType == typeof(DbContextOptions<AppDbContext>));
+                    var descriptor = services.SingleOrDefault(service => service.ServiceType == typeof(DbContextOptions<AppDbContext>));
 
                     if (descriptor is not null)
                     {
                         services.Remove(descriptor);
                     }
 
-                    services.AddDbContext<AppDbContext>(options => 
+                    services.AddDbContext<AppDbContext>(options =>
                     {
                         options.UseSqlServer(_msSqlContainer.GetConnectionString());
                     });

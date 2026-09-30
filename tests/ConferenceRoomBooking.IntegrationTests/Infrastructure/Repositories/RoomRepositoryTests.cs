@@ -1,6 +1,7 @@
 ﻿using ConferenceRoomBooking.Domain.Entities;
 using ConferenceRoomBooking.Domain.Enums;
 using ConferenceRoomBooking.Infrastructure.Persistence.Repositories;
+using ConferenceRoomBooking.TestInfrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConferenceRoomBooking.IntegrationTests.Infrastructure.Repositories;

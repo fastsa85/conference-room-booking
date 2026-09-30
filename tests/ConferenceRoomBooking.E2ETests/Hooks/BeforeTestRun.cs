@@ -1,5 +1,6 @@
 ﻿using ConferenceRoomBooking.E2ETests.Support;
 using ConferenceRoomBooking.E2ETests.Support.Models;
+using ConferenceRoomBooking.TestInfrastructure;
 using Microsoft.Extensions.Configuration;
 using Reqnroll.BoDi;
 
