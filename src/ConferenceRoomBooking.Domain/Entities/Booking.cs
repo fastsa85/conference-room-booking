@@ -17,4 +17,6 @@ public class Booking
     public decimal TotalCost { get; set; }
 
     public Room Room { get; set; } = null!;
+
+    public ICollection<BookingAdditionalService> AdditionalServices { get; set; } = new List<BookingAdditionalService>();
 }
