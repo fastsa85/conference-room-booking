@@ -13,6 +13,7 @@ public class ApiFixture : IAsyncDisposable
     private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
 
     private WebApplicationFactory<Program> _factory = null!;
+    private DatabaseCleaner _databaseCleaner = null!;
 
     public HttpClient Client { get; private set; } = null!;
 
@@ -45,16 +46,14 @@ public class ApiFixture : IAsyncDisposable
 
         await dbContext.Database.MigrateAsync();
 
+        _databaseCleaner = new DatabaseCleaner(_msSqlContainer.GetConnectionString());
+
         Client = _factory.CreateClient();
     }
 
     public async Task ResetDatabaseAsync()
     {
-        using var scope = _factory.Services.CreateScope();
-
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        await dbContext.Rooms.ExecuteDeleteAsync();
+        await _databaseCleaner.CleanAsync();
     }
 
     public async ValueTask DisposeAsync()
@@ -86,11 +85,22 @@ public class ApiFixture : IAsyncDisposable
     {
         using var scope = _factory.Services.CreateScope();
 
-        var dbContext = scope.ServiceProvider
-            .GetRequiredService<AppDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         dbContext.Rooms.Add(room);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<Booking?> GetBookingAsync(Guid id)
+    {
+        using var scope = _factory.Services.CreateScope();
+
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        return await dbContext.Bookings
+            .Include(booking => booking.AdditionalServices)
+            .AsNoTracking()
+            .SingleOrDefaultAsync(booking => booking.Id == id);
     }
 }
 

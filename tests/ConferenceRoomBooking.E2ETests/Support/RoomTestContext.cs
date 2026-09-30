@@ -20,4 +20,6 @@ public class RoomTestContext
     public List<RoomResponse>? RoomsResponse { get; set; }
 
     public Guid? RoomId { get; set; }
+
+    public BookingResponse? BookingResponse { get; set; }
 }

@@ -1,3 +1,5 @@
+using ConferenceRoomBooking.Application.Bookings;
+using ConferenceRoomBooking.Application.Pricing;
 using ConferenceRoomBooking.Application.Rooms;
 using ConferenceRoomBooking.Infrastructure.Persistence;
 using ConferenceRoomBooking.Infrastructure.Persistence.Repositories;
@@ -13,6 +15,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<BookingValidator>();
 
 var app = builder.Build();
 
