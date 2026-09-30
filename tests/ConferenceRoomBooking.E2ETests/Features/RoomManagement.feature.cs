@@ -128,28 +128,28 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
             else
             {
                 await this.ScenarioStartAsync();
-                global::Reqnroll.Table table5 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table8 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table5.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2000"});
 #line 9
-    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table5, "Given ");
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table8, "Given ");
 #line hidden
-                global::Reqnroll.Table table6 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table9 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table6.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table6.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 12
-    await testRunner.AndAsync("the room has the following services", ((string)(null)), table6, "And ");
+    await testRunner.AndAsync("the room has the following services", ((string)(null)), table9, "And ");
 #line hidden
 #line 17
     await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -157,28 +157,28 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line 18
     await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-                global::Reqnroll.Table table7 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table10 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table7.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2000"});
 #line 19
-    await testRunner.AndAsync("the room should have the following details", ((string)(null)), table7, "And ");
+    await testRunner.AndAsync("the room should have the following details", ((string)(null)), table10, "And ");
 #line hidden
-                global::Reqnroll.Table table8 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table11 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table8.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table8.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 22
-    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table8, "And ");
+    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table11, "And ");
 #line hidden
 #line 27
     await testRunner.WhenAsync("the client requests the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -186,28 +186,28 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line 28
     await testRunner.ThenAsync("the response status code should be 200", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-                global::Reqnroll.Table table9 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table12 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table9.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2000"});
 #line 29
-    await testRunner.AndAsync("the room should have the following details", ((string)(null)), table9, "And ");
+    await testRunner.AndAsync("the room should have the following details", ((string)(null)), table12, "And ");
 #line hidden
-                global::Reqnroll.Table table10 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table13 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table10.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table10.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 32
-    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table10, "And ");
+    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table13, "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -233,28 +233,28 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
             else
             {
                 await this.ScenarioStartAsync();
-                global::Reqnroll.Table table11 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table14 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table11.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2000"});
 #line 43
-    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table11, "Given ");
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table14, "Given ");
 #line hidden
-                global::Reqnroll.Table table12 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table15 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table12.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table12.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 46
-    await testRunner.AndAsync("the room has the following services", ((string)(null)), table12, "And ");
+    await testRunner.AndAsync("the room has the following services", ((string)(null)), table15, "And ");
 #line hidden
 #line 50
     await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -262,31 +262,31 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line 51
     await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-                global::Reqnroll.Table table13 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table16 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table13.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2500"});
 #line 53
-    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table13, "Given ");
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table16, "Given ");
 #line hidden
-                global::Reqnroll.Table table14 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table17 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table14.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table14.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
-                table14.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "Sound",
                             "700"});
 #line 56
-    await testRunner.AndAsync("the room has the following services", ((string)(null)), table14, "And ");
+    await testRunner.AndAsync("the room has the following services", ((string)(null)), table17, "And ");
 #line hidden
 #line 61
     await testRunner.WhenAsync("the client updates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -300,31 +300,31 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line 65
     await testRunner.ThenAsync("the response status code should be 200", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-                global::Reqnroll.Table table15 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table18 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table15.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2500"});
 #line 66
-    await testRunner.AndAsync("the room should have the following details", ((string)(null)), table15, "And ");
+    await testRunner.AndAsync("the room should have the following details", ((string)(null)), table18, "And ");
 #line hidden
-                global::Reqnroll.Table table16 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table19 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table16.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table16.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
-                table16.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "Sound",
                             "700"});
 #line 69
-    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table16, "And ");
+    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table19, "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
@@ -350,28 +350,28 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
             else
             {
                 await this.ScenarioStartAsync();
-                global::Reqnroll.Table table17 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table20 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table17.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2000"});
 #line 80
-    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table17, "Given ");
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table20, "Given ");
 #line hidden
-                global::Reqnroll.Table table18 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table21 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table18.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table18.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 83
-    await testRunner.AndAsync("the room has the following services", ((string)(null)), table18, "And ");
+    await testRunner.AndAsync("the room has the following services", ((string)(null)), table21, "And ");
 #line hidden
 #line 87
     await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -415,28 +415,28 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
             else
             {
                 await this.ScenarioStartAsync();
-                global::Reqnroll.Table table19 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table22 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table19.AddRow(new string[] {
+                table22.AddRow(new string[] {
                             "Meeting Room A",
                             "50",
                             "2000"});
 #line 98
-    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table19, "Given ");
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table22, "Given ");
 #line hidden
-                global::Reqnroll.Table table20 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table23 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table20.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table20.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 101
-    await testRunner.AndAsync("the room has the following services", ((string)(null)), table20, "And ");
+    await testRunner.AndAsync("the room has the following services", ((string)(null)), table23, "And ");
 #line hidden
 #line 105
     await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -444,28 +444,28 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line 106
     await testRunner.ThenAsync("the response status code should be 201", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-                global::Reqnroll.Table table21 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table24 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Capacity",
                             "HourlyRate"});
-                table21.AddRow(new string[] {
+                table24.AddRow(new string[] {
                             "Meeting Room B",
                             "20",
                             "1500"});
 #line 108
-    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table21, "Given ");
+    await testRunner.GivenAsync("a room with the following details", ((string)(null)), table24, "Given ");
 #line hidden
-                global::Reqnroll.Table table22 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table25 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table22.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table22.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 111
-    await testRunner.AndAsync("the room has the following services", ((string)(null)), table22, "And ");
+    await testRunner.AndAsync("the room has the following services", ((string)(null)), table25, "And ");
 #line hidden
 #line 115
     await testRunner.WhenAsync("the client creates the room", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -485,12 +485,12 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line 122
     await testRunner.ThenAsync("the response status code should be 200", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-                global::Reqnroll.Table table23 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table26 = new global::Reqnroll.Table(new string[] {
                             "Name"});
-                table23.AddRow(new string[] {
+                table26.AddRow(new string[] {
                             "Meeting Room A"});
 #line 123
-    await testRunner.AndAsync("the following rooms should be returned", ((string)(null)), table23, "And ");
+    await testRunner.AndAsync("the following rooms should be returned", ((string)(null)), table26, "And ");
 #line hidden
 #line 127
     await testRunner.WhenAsync("the client requests the room \"Meeting Room A\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
@@ -498,17 +498,17 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line 128
     await testRunner.ThenAsync("the response status code should be 200", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-                global::Reqnroll.Table table24 = new global::Reqnroll.Table(new string[] {
+                global::Reqnroll.Table table27 = new global::Reqnroll.Table(new string[] {
                             "Name",
                             "Price"});
-                table24.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "Projector",
                             "500"});
-                table24.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "Wi-Fi",
                             "300"});
 #line 129
-    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table24, "And ");
+    await testRunner.AndAsync("the room should have the following services", ((string)(null)), table27, "And ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();
