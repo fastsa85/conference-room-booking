@@ -10,6 +10,8 @@ namespace ConferenceRoomBooking.IntegrationTests.Api;
 [Category("ApiIntegration")]
 public class BookingsControllerTests
 {
+    private static DateTime FutureBookingDate => DateTime.Today.AddDays(1);
+
     private const string BookingsEndpoint = "/api/bookings";
     private ApiFixture _fixture = null!;
 
@@ -45,8 +47,8 @@ public class BookingsControllerTests
         var request = new
         {
             RoomId = room.Id,
-            Start = new DateTime(2026, 10, 1, 10, 0, 0),
-            End = new DateTime(2026, 10, 1, 12, 0, 0),
+            Start = FutureBookingDate.AddHours(10),
+            End = FutureBookingDate.AddHours(12),
             AdditionalServiceIds = Array.Empty<Guid>()
         };
 
@@ -100,8 +102,8 @@ public class BookingsControllerTests
         var request = new
         {
             RoomId = room.Id,
-            Start = new DateTime(2026, 10, 1, 10, 0, 0),
-            End = new DateTime(2026, 10, 1, 12, 0, 0),
+            Start = FutureBookingDate.AddHours(10),
+            End = FutureBookingDate.AddHours(12),
             AdditionalServiceIds = new[]
             {
                 projector.Id,
@@ -221,8 +223,8 @@ public class BookingsControllerTests
         {
             Id = Guid.NewGuid(),
             RoomId = room.Id,
-            Start = new DateTime(2026, 10, 1, 10, 0, 0),
-            End = new DateTime(2026, 10, 1, 12, 0, 0),
+            Start = FutureBookingDate.AddHours(10),
+            End = FutureBookingDate.AddHours(12),
             Status = BookingStatus.Confirmed,
             TotalCost = 200m
         });
@@ -232,8 +234,8 @@ public class BookingsControllerTests
         var request = new
         {
             RoomId = room.Id,
-            Start = new DateTime(2026, 10, 1, 11, 0, 0),
-            End = new DateTime(2026, 10, 1, 13, 0, 0),
+            Start = FutureBookingDate.AddHours(11),
+            End = FutureBookingDate.AddHours(13),
             AdditionalServiceIds = Array.Empty<Guid>()
         };
 
@@ -256,8 +258,8 @@ public class BookingsControllerTests
         {
             Id = Guid.NewGuid(),
             RoomId = room.Id,
-            Start = new DateTime(2026, 10, 1, 10, 0, 0),
-            End = new DateTime(2026, 10, 1, 12, 0, 0),
+            Start = FutureBookingDate.AddHours(10),
+            End = FutureBookingDate.AddHours(12),
             Status = BookingStatus.Confirmed,
             TotalCost = 200m
         });
@@ -267,8 +269,8 @@ public class BookingsControllerTests
         var request = new
         {
             RoomId = room.Id,
-            Start = new DateTime(2026, 10, 1, 12, 0, 0),
-            End = new DateTime(2026, 10, 1, 14, 0, 0),
+            Start = FutureBookingDate.AddHours(12),
+            End = FutureBookingDate.AddHours(14),
             AdditionalServiceIds = Array.Empty<Guid>()
         };
 

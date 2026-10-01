@@ -4,6 +4,7 @@ using ConferenceRoomBooking.Application.Rooms;
 using ConferenceRoomBooking.Infrastructure.Persistence;
 using ConferenceRoomBooking.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 

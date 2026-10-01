@@ -9,7 +9,6 @@ namespace ConferenceRoomBooking.E2ETests.StepDefinitions;
 public class RoomManagementSteps
 {
     private const string RoomsEndpoint = "/api/rooms";
-    private const string AvailableRoomsEndpoint = "/api/rooms/available";
 
     private readonly RoomTestContext _context;
 
@@ -147,26 +146,6 @@ public class RoomManagementSteps
         }
     }
 
-    [When("the client searches for available rooms")]
-    public async Task WhenTheClientSearchesForAvailableRooms(Table table)
-    {
-        var row = table.Rows.Single();
-
-        var start = DateTime.Parse(row["Start"]);
-        var end = DateTime.Parse(row["End"]);
-        var capacity = int.Parse(row["Capacity"]);
-
-        var url = $"{AvailableRoomsEndpoint}?start={start:yyyy-MM-ddTHH:mm:ss}&end={end:yyyy-MM-ddTHH:mm:ss}&capacity={capacity}";
-
-        _context.Response = await _context.HttpClient.GetAsync(url);
-
-        if (_context.Response.IsSuccessStatusCode)
-        {
-            _context.RoomsResponse = await _context.Response.Content
-                .ReadFromJsonAsync<List<RoomResponse>>();
-        }
-    }
-
     [Then("the response status code should be {int}")]
     public void ThenTheResponseStatusCodeShouldBe(int expectedStatusCode)
     {
@@ -203,9 +182,7 @@ public class RoomManagementSteps
     {
         Assert.That(_context.RoomResponse, Is.Not.Null);
 
-        Assert.That(
-            _context.RoomResponse!.AvailableServices,
-            Has.Count.EqualTo(table.Rows.Count));
+        Assert.That(_context.RoomResponse!.AvailableServices, Has.Count.EqualTo(table.Rows.Count));
 
         foreach (var expected in table.Rows)
         {
@@ -245,9 +222,7 @@ public class RoomManagementSteps
     [Then("the room {string} should not be returned")]
     public void ThenTheRoomShouldNotBeReturned(string roomName)
     {
-        Assert.That(
-            _context.RoomsResponse,
-            Is.Not.Null);
+        Assert.That(_context.RoomsResponse, Is.Not.Null);
 
         Assert.That(
             _context.RoomsResponse!.Any(room => room.Name == roomName),

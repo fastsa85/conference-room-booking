@@ -9,6 +9,7 @@ namespace ConferenceRoomBooking.E2ETests.StepDefinitions;
 public class RoomBookingSteps
 {
     private const string BookingsEndpoint = "/api/bookings";
+    private const string AvailableRoomsEndpoint = "/api/rooms/available";
     private readonly RoomTestContext _context;
 
     public RoomBookingSteps(RoomTestContext context)
@@ -21,13 +22,12 @@ public class RoomBookingSteps
     {
         var row = table.Rows.Single();
 
-        var start = DateTime.Parse(row["Start"]);
-        var end = DateTime.Parse(row["End"]);
+        var start = ParseDateTime(row["Start"]);
+        var end = ParseDateTime(row["End"]);
 
         var serviceNames = row["Services"].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        Assert.That(_context.RoomResponse,Is.Not.Null,
-            "Room must be created before it can be booked.");
+        Assert.That(_context.RoomResponse,Is.Not.Null, "Room must be created before it can be booked.");
 
         var room = _context.RoomResponse!;
 
@@ -59,6 +59,25 @@ public class RoomBookingSteps
             _context.BookingResponse = await _context.Response.Content.ReadFromJsonAsync<BookingResponse>();
         }
     }
+    [When("the client searches for available rooms")]
+    public async Task WhenTheClientSearchesForAvailableRooms(Table table)
+    {
+        var row = table.Rows.Single();
+
+        var start = ParseDateTime(row["Start"]);
+        var end = ParseDateTime(row["End"]);
+        var capacity = int.Parse(row["Capacity"]);
+
+        var url = $"{AvailableRoomsEndpoint}?start={start:yyyy-MM-ddTHH:mm:ss}&end={end:yyyy-MM-ddTHH:mm:ss}&capacity={capacity}";
+
+        _context.Response = await _context.HttpClient.GetAsync(url);
+
+        if (_context.Response.IsSuccessStatusCode)
+        {
+            _context.RoomsResponse = await _context.Response.Content
+                .ReadFromJsonAsync<List<RoomResponse>>();
+        }
+    }
 
     [Then("the booking should have total cost {decimal}")]
     public void ThenTheBookingShouldHaveTotalCost(decimal expectedTotalCost)
@@ -74,5 +93,20 @@ public class RoomBookingSteps
         Assert.That(_context.BookingResponse, Is.Not.Null);
 
         Assert.That(_context.BookingResponse!.Status, Is.EqualTo(expectedStatus));
+    }
+
+    private static DateTime ParseDateTime(string value)
+    {
+        const string tomorrowPrefix = "tomorrow ";
+
+        if (value.StartsWith(tomorrowPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var tomorrow = DateOnly.FromDateTime(DateTime.Now).AddDays(1);
+            var time = TimeOnly.Parse(value[tomorrowPrefix.Length..]);
+
+            return tomorrow.ToDateTime(time);
+        }
+
+        return DateTime.Parse(value);
     }
 }
