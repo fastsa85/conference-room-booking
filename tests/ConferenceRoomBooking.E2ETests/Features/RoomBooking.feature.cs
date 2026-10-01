@@ -162,8 +162,8 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                             "End",
                             "Services"});
                 table7.AddRow(new string[] {
-                            "2026-10-01 10:00",
-                            "2026-10-01 12:00",
+                            "tomorrow 10:00",
+                            "tomorrow 12:00",
                             "Projector, Catering"});
 #line 17
     await testRunner.WhenAsync("the client books the room", ((string)(null)), table7, "When ");
@@ -223,8 +223,8 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                             "End",
                             "Services"});
                 table9.AddRow(new string[] {
-                            "2026-10-01 10:00",
-                            "2026-10-01 12:00",
+                            "tomorrow 10:00",
+                            "tomorrow 12:00",
                             ""});
 #line 32
     await testRunner.WhenAsync("the client books the room", ((string)(null)), table9, "When ");
@@ -237,8 +237,8 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                             "End",
                             "Capacity"});
                 table10.AddRow(new string[] {
-                            "2026-10-01 11:00",
-                            "2026-10-01 13:00",
+                            "tomorrow 11:00",
+                            "tomorrow 13:00",
                             "10"});
 #line 37
     await testRunner.WhenAsync("the client searches for available rooms", ((string)(null)), table10, "When ");
@@ -295,8 +295,8 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                             "End",
                             "Services"});
                 table12.AddRow(new string[] {
-                            "2026-10-01 10:00",
-                            "2026-10-01 12:00",
+                            "tomorrow 10:00",
+                            "tomorrow 12:00",
                             ""});
 #line 50
     await testRunner.WhenAsync("the client books the room", ((string)(null)), table12, "When ");
@@ -309,8 +309,8 @@ this.ScenarioInitialize(scenarioInfo, ruleInfo);
                             "End",
                             "Services"});
                 table13.AddRow(new string[] {
-                            "2026-10-01 11:00",
-                            "2026-10-01 13:00",
+                            "tomorrow 11:00",
+                            "tomorrow 13:00",
                             ""});
 #line 55
     await testRunner.WhenAsync("the client books the room", ((string)(null)), table13, "When ");

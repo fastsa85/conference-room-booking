@@ -15,8 +15,8 @@ Scenario: Book a conference room with additional services
     Then the response status code should be 201
 
     When the client books the room
-        | Start            | End              | Services            |
-        | 2026-10-01 10:00 | 2026-10-01 12:00 | Projector, Catering |
+        | Start            | End          | Services            |
+        | tomorrow 10:00 | tomorrow 12:00 | Projector, Catering | 
 
     Then the response status code should be 201
     And the booking should have total cost 350
@@ -30,13 +30,13 @@ Scenario: Booked room is not available for overlapping time
     Then the response status code should be 201
 
     When the client books the room
-        | Start            | End              | Services |
-        | 2026-10-01 10:00 | 2026-10-01 12:00 |          |
+        | Start             | End               | Services |
+        | tomorrow 10:00    | tomorrow 12:00    |          |
     Then the response status code should be 201
 
     When the client searches for available rooms
-        | Start            | End              | Capacity |
-        | 2026-10-01 11:00 | 2026-10-01 13:00 | 10       |
+        | Start          | End              | Capacity |
+        | tomorrow 11:00 | tomorrow 13:00   | 10       |
     Then the response status code should be 200
     And the room "Meeting Room" should not be returned
 
@@ -48,11 +48,11 @@ Scenario: Overlapping booking is rejected
     Then the response status code should be 201
 
     When the client books the room
-        | Start            | End              | Services |
-        | 2026-10-01 10:00 | 2026-10-01 12:00 |          |
+        | Start             | End               | Services |
+        | tomorrow 10:00    | tomorrow 12:00    |          |
     Then the response status code should be 201
 
     When the client books the room
-        | Start            | End              | Services |
-        | 2026-10-01 11:00 | 2026-10-01 13:00 |          |
+        | Start          | End              | Services |
+        | tomorrow 11:00 | tomorrow 13:00   |          |
     Then the response status code should be 409
